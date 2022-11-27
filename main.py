@@ -1,15 +1,14 @@
-import cv2 
+from cv2 import cv2
 import mediapipe
+from cvzone.HandTrackingModule import HandDetector
 
-if __main__=="__main__":
-    mycam= cv2.VideoCapture(0)
+cap = cv2.VideoCapture(0)  # 0 for webcam
+detector = HandDetector(detectionCon=0.8, maxHands=2)
 
-    while True:
-        ret_val, frame= mycam.read()
+while True:
+    success, img = cap.read()
+    img = cv2.flip(img, 1)  # flip for webcam
+    hands, img = detector.findHands(img, flipType=False)
 
-        cv2.imshow("frame",frame)
-
-        if cv2.waitKey(1) == 27:
-            break
-
- 
+    cv2.imshow("MultiHand", img)
+    cv2.waitKey(1)
