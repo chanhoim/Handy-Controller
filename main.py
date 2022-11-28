@@ -30,7 +30,8 @@ white = (255, 255, 255)
 purple = (255, 0, 255)
 
 pTime = 0
-vTime = 0.1
+volTime = 0.1
+medTime = 0.5
 
 cap = cv2.VideoCapture(camInput)
 detector = HandDetector(detectionCon=0.8, maxHands=2)
@@ -54,12 +55,8 @@ while True:
 
         print(f"{handType1} Hand, Center = {centerPoint1}, Fingers = {fingers1}")
 
-        # handType1 is right hand
-        if handType1 == "Right":
-            for id in range(1, 5):
-                length, info, img = detector.findDistance(lmList1[4], lmList1[tipIds[id]], img)
-            # TODO: implement 1 hand quit sign
-            # quit sign
+        # TODO: implement 1 hand quit sign
+        # quit sign
 
         if len(hands) == 2:
             # hand 2
@@ -75,26 +72,49 @@ while True:
             # handType1 is left hand and handType2 is right hand
             if handType1 == "Left" and handType2 == "Right":
                 if fingers1.count(1) == 1:
-                    print("Volume Mode")
-                    for id in range(1, 5):
-                        iLength, iInfo, img = detector.findDistance(lmList2[4], lmList2[8], img)
-                        mLength, mInfo, img = detector.findDistance(lmList2[8], lmList2[12], img)
-                    if iLength < 40:
-                        cv2.circle(img, (iInfo[4], iInfo[5]), circleRadius3, blue, cv2.FILLED)
-                        print("volume up")
-                        keyboard.press(Key.media_volume_up)
-                        time.sleep(vTime)
-                        keyboard.release(Key.media_volume_up)
+                    print("Volume Control Mode")
+                    iLength, iInfo, img = detector.findDistance(lmList2[4], lmList2[8], img)
+                    mLength, mInfo, img = detector.findDistance(lmList2[8], lmList2[12], img)
 
-                    if mLength < 40:
-                        cv2.circle(img, (mInfo[4], mInfo[5]), circleRadius3, blue, cv2.FILLED)
+                    if iLength < 30:
+                        cv2.circle(img, (iInfo[4], iInfo[5]), circleRadius3, blue, cv2.FILLED)
                         print("volume down")
                         keyboard.press(Key.media_volume_down)
-                        time.sleep(vTime)
+                        time.sleep(volTime)
                         keyboard.release(Key.media_volume_down)
 
+                    if mLength < 30:
+                        cv2.circle(img, (mInfo[4], mInfo[5]), circleRadius3, blue, cv2.FILLED)
+                        print("volume up")
+                        keyboard.press(Key.media_volume_up)
+                        time.sleep(volTime)
+                        keyboard.release(Key.media_volume_up)
+
                 elif fingers1.count(1) == 2:
-                    print("2")
+                    print("Media Control Mode")
+                    iLength, iInfo, img = detector.findDistance(lmList2[4], lmList2[8], img)
+                    mLength, mInfo, img = detector.findDistance(lmList2[8], lmList2[12], img)
+
+                    if fingers2 == [1, 0, 0, 0, 0]:
+                        print("play/pause")
+                        keyboard.press(Key.media_play_pause)
+                        time.sleep(medTime)
+                        keyboard.release(Key.media_play_pause)
+
+                    if iLength < 30:
+                        cv2.circle(img, (iInfo[4], iInfo[5]), circleRadius3, blue, cv2.FILLED)
+                        print("play previous")
+                        keyboard.press(Key.media_previous)
+                        time.sleep(volTime)
+                        keyboard.release(Key.media_previous)
+
+                    if mLength < 30:
+                        cv2.circle(img, (mInfo[4], mInfo[5]), circleRadius3, blue, cv2.FILLED)
+                        print("play next")
+                        keyboard.press(Key.media_next)
+                        time.sleep(volTime)
+                        keyboard.release(Key.media_next)
+
                 elif fingers1.count(1) == 3:
                     print("3")
                 elif fingers1.count(1) == 4:
@@ -106,28 +126,50 @@ while True:
 
             # handType2 is left hand and handType1 is right hand
             if handType1 == "Right" and handType2 == "Left":
-                for id in range(1, 5):
-                    length, info, img = detector.findDistance(lmList1[4], lmList1[tipIds[id]], img)
                 if fingers2.count(1) == 1:
                     print("Volume Mode")
-                    for id in range(1, 5):
-                        iLength, iInfo, img = detector.findDistance(lmList1[4], lmList2[8], img)
-                        mLength, mInfo, img = detector.findDistance(lmList1[8], lmList2[12], img)
-                    if iLength < 40:
-                        cv2.circle(img, (iInfo[4], iInfo[5]), circleRadius3, blue, cv2.FILLED)
-                        print("volume up")
-                        keyboard.press(Key.media_volume_up)
-                        time.sleep(vTime)
-                        keyboard.release(Key.media_volume_up)
+                    iLength, iInfo, img = detector.findDistance(lmList1[4], lmList1[8], img)
+                    mLength, mInfo, img = detector.findDistance(lmList1[8], lmList1[12], img)
 
-                    if mLength < 40:
-                        cv2.circle(img, (mInfo[4], mInfo[5]), circleRadius3, blue, cv2.FILLED)
+                    if iLength < 30:
+                        cv2.circle(img, (iInfo[4], iInfo[5]), circleRadius3, blue, cv2.FILLED)
                         print("volume down")
                         keyboard.press(Key.media_volume_down)
-                        time.sleep(vTime)
+                        time.sleep(volTime)
                         keyboard.release(Key.media_volume_down)
+
+                    if mLength < 30:
+                        cv2.circle(img, (mInfo[4], mInfo[5]), circleRadius3, blue, cv2.FILLED)
+                        print("volume up")
+                        keyboard.press(Key.media_volume_up)
+                        time.sleep(volTime)
+                        keyboard.release(Key.media_volume_up)
+
                 elif fingers2.count(1) == 2:
-                    print("2")
+                    print("Media Control Mode")
+                    iLength, iInfo, img = detector.findDistance(lmList1[4], lmList1[8], img)
+                    mLength, mInfo, img = detector.findDistance(lmList1[8], lmList1[12], img)
+
+                    if fingers1 == [1, 0, 0, 0, 0]:
+                        print("play/pause")
+                        keyboard.press(Key.media_play_pause)
+                        time.sleep(medTime)
+                        keyboard.release(Key.media_play_pause)
+
+                    if iLength < 30:
+                        cv2.circle(img, (iInfo[4], iInfo[5]), circleRadius3, blue, cv2.FILLED)
+                        print("play previous")
+                        keyboard.press(Key.media_previous)
+                        time.sleep(volTime)
+                        keyboard.release(Key.media_previous)
+
+                    if mLength < 30:
+                        cv2.circle(img, (mInfo[4], mInfo[5]), circleRadius3, blue, cv2.FILLED)
+                        print("play next")
+                        keyboard.press(Key.media_next)
+                        time.sleep(volTime)
+                        keyboard.release(Key.media_next)
+
                 elif fingers2.count(1) == 3:
                     print("3")
                 elif fingers2.count(1) == 4:
@@ -135,7 +177,7 @@ while True:
                 elif fingers2.count(1) == 5:
                     print("5")
                 else:
-                    print("0")
+                    print("Desktop Mode")
             print("")
 
     # show fps
