@@ -1,6 +1,6 @@
 from cv2 import cv2
 import time
-from cvzone.HandTrackingModule import HandDetector
+from HandTrackingModule import HandDetector
 
 cap = cv2.VideoCapture(0)  # 0 for webcam, 1 for external
 detector = HandDetector(detectionCon=0.8, maxHands=2)
