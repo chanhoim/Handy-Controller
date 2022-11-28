@@ -2,15 +2,20 @@ from cv2 import cv2
 import time
 from HandTrackingModule import HandDetector
 
-cap = cv2.VideoCapture(0)  # 0 for webcam, 1 for external
+camInput = 1  # 0 for webcam, 1 for external source
+
+cap = cv2.VideoCapture(camInput)
 detector = HandDetector(detectionCon=0.8, maxHands=2)
 pTime = 0
 tipIds = [4, 8, 12, 16, 20]
 
 while True:
     success, img = cap.read()
-    img = cv2.flip(img, 1)  # flip for webcam
-    hands, img = detector.findHands(img, flipType=False)
+    if camInput == 0:
+        img = cv2.flip(img, 1)  # flip for webcam
+        hands, img = detector.findHands(img, flipType=False)  # flip type for webcam
+    else:
+        hands, img = detector.findHands(img)
 
     if hands:
         # hand1

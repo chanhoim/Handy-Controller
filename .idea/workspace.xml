@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="80127102-e668-4a11-a90a-8b5e193f01de" name="Changes" comment="added 2 handed feature for further function implementation">
-      <change afterPath="$PROJECT_DIR$/HandTrackingModule.py" afterDir="false" />
+    <list default="true" id="80127102-e668-4a11-a90a-8b5e193f01de" name="Changes" comment="copied and edited an external library code into workspace for easier modification.">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HandTrackingModule.py" beforeDir="false" afterPath="$PROJECT_DIR$/HandTrackingModule.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -208,7 +209,14 @@
       <option name="project" value="LOCAL" />
       <updated>1669606489391</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="copied and edited an external library code into workspace for easier modification.">
+      <created>1669606935989</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1669606935989</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -240,6 +248,7 @@
     <MESSAGE value="implemented a fps feature" />
     <MESSAGE value="added bounding box feature and tested for external camera (smartphone)" />
     <MESSAGE value="added 2 handed feature for further function implementation" />
-    <option name="LAST_COMMIT_MESSAGE" value="added 2 handed feature for further function implementation" />
+    <MESSAGE value="copied and edited an external library code into workspace for easier modification." />
+    <option name="LAST_COMMIT_MESSAGE" value="copied and edited an external library code into workspace for easier modification." />
   </component>
 </project>

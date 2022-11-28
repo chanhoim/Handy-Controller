@@ -144,7 +144,6 @@ class HandDetector:
         myHandType = myHand["type"]
         myLmList = myHand["lmList"]
         if self.results.multi_hand_landmarks:
-            print("hi this is test")
             fingers = []
             # right thumb
             if myHandType == "Right":
