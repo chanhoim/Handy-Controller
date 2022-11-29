@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="80127102-e668-4a11-a90a-8b5e193f01de" name="Changes" comment="major change in gestures to implement inactive state of features">
-      <change afterPath="$PROJECT_DIR$/keyboardTest.py" afterDir="false" />
+    <list default="true" id="80127102-e668-4a11-a90a-8b5e193f01de" name="Changes" comment="workarounds for desktop control mode and major change in gestures to implement inactive state of features">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HandTrackingModule.py" beforeDir="false" afterPath="$PROJECT_DIR$/HandTrackingModule.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/test.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -246,7 +243,14 @@
       <option name="project" value="LOCAL" />
       <updated>1669689359156</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="workarounds for desktop control mode and major change in gestures to implement inactive state of features">
+      <created>1669735337422</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1669735337422</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -283,6 +287,7 @@
     <MESSAGE value="implemented a volume control feature in MacOSX, and it's super cool" />
     <MESSAGE value="implemented a media control feature and fixed minor volume control error" />
     <MESSAGE value="major change in gesture and implemented a page control feature (scroll down and up)" />
-    <option name="LAST_COMMIT_MESSAGE" value="major change in gesture and implemented a page control feature (scroll down and up)" />
+    <MESSAGE value="workarounds for desktop control mode and major change in gestures to implement inactive state of features" />
+    <option name="LAST_COMMIT_MESSAGE" value="workarounds for desktop control mode and major change in gestures to implement inactive state of features" />
   </component>
 </project>
