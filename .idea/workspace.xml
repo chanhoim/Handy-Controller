@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="80127102-e668-4a11-a90a-8b5e193f01de" name="Changes" comment="implemented a volume control feature in MacOSX, and it's super cool">
+    <list default="true" id="80127102-e668-4a11-a90a-8b5e193f01de" name="Changes" comment="implemented a media control feature and fixed minor volume control error">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
@@ -229,7 +229,14 @@
       <option name="project" value="LOCAL" />
       <updated>1669644140222</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="implemented a media control feature and fixed minor volume control error">
+      <created>1669647720229</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1669647720229</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -264,6 +271,7 @@
     <MESSAGE value="copied and edited an external library code into workspace for easier modification." />
     <MESSAGE value="added camInput variable for easier input selection." />
     <MESSAGE value="implemented a volume control feature in MacOSX, and it's super cool" />
-    <option name="LAST_COMMIT_MESSAGE" value="implemented a volume control feature in MacOSX, and it's super cool" />
+    <MESSAGE value="implemented a media control feature and fixed minor volume control error" />
+    <option name="LAST_COMMIT_MESSAGE" value="implemented a media control feature and fixed minor volume control error" />
   </component>
 </project>
