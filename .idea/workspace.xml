@@ -1,16 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="80127102-e668-4a11-a90a-8b5e193f01de" name="Changes" comment="set global variables of finger to finger distances for easier modification">
-      <change afterPath="$PROJECT_DIR$/.python-version" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
+    <list default="true" id="80127102-e668-4a11-a90a-8b5e193f01de" name="Changes" comment="created a requirements.txt file for collaboration and implemented a single-handed gesture control">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HandTrackingModule.py" beforeDir="false" afterPath="$PROJECT_DIR$/HandTrackingModule.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/keyboardTest.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -284,7 +277,14 @@
       <option name="project" value="LOCAL" />
       <updated>1669737829805</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="created a requirements.txt file for collaboration and implemented a single-handed gesture control">
+      <created>1669786942256</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1669786942256</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -343,6 +343,7 @@
     <MESSAGE value="major change in gesture and implemented a page control feature (scroll down and up)" />
     <MESSAGE value="workarounds for desktop control mode and major change in gestures to implement inactive state of features" />
     <MESSAGE value="set global variables of finger to finger distances for easier modification" />
-    <option name="LAST_COMMIT_MESSAGE" value="set global variables of finger to finger distances for easier modification" />
+    <MESSAGE value="created a requirements.txt file for collaboration and implemented a single-handed gesture control" />
+    <option name="LAST_COMMIT_MESSAGE" value="created a requirements.txt file for collaboration and implemented a single-handed gesture control" />
   </component>
 </project>
