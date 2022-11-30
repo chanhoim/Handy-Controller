@@ -1,10 +1,21 @@
 from cv2 import cv2
 import time
 import subprocess
+import platform
 from HandTrackingModule import HandDetector
 from pynput.keyboard import Key, Controller
 
 keyboard = Controller()
+
+# check operating system
+os = platform.system()  # Windows / Darwin(Mac)
+
+if os == "Windows":
+    print("Program running on Windows")
+elif os == "Darwin":
+    print("Program running on MacOSX")
+else:
+    print("Program running on other OSs")
 
 # finger tip variables
 tipIds = [4, 8, 12, 16, 20]
@@ -47,6 +58,7 @@ tmDist = 20
 camInput = 0  # 0 for webcam, 1 for external source
 cap = cv2.VideoCapture(camInput)
 
+# new detector object from HandDetector class
 detector = HandDetector(detectionCon=0.8, maxHands=2)
 
 
@@ -69,33 +81,11 @@ def asQuote(aStr):
     return '"{}"'.format(aStr)
 
 
-# previous desktop
-pdScript = '''
-tell application "System Events"
-    key code 123 using {control down}
-end tell
-'''
-
-# next desktop
-ndScript = '''
-tell application "System Events"
-    key code 124 using {control down}
-end tell
-'''
-
-# mission control
-mcScript = '''
-tell application "System Events"
-    key code 126 using {control down}
-end tell
-'''
-
-# show desktop
-sdScript = '''
-tell application "System Events"
-    key code 103
-end tell
-'''
+# apple scripts for desktop control
+pdScript = '''tell application "System Events" to key code 123 using {control down}'''
+ndScript = '''tell application "System Events" to key code 124 using {control down}'''
+mcScript = '''tell application "System Events" to key code 126 using {control down}'''
+sdScript = '''tell application "System Events" to key code 103'''
 
 while True:
     success, img = cap.read()
@@ -106,7 +96,7 @@ while True:
         hands, img = detector.findHands(img)
 
     if hands:
-        # single hand detected 
+        # 1. single hand detected
         if len(hands) == 1:
             # hand 1
             hand1 = hands[0]
@@ -118,37 +108,64 @@ while True:
 
             print(f"{handType1} Hand, Center = {centerPoint1}, Fingers = {fingers1}")
 
-            # 0. Idle State Mode
-            if fingers1.count(1) == 0:
+            # 1-0. Idle State Mode
+            if fingers1[1:5] == [0, 0, 0, 0]:
                 print("Idle State Mode")
 
-            # 1. Control Mode
-            elif fingers1.count(1) == 1:
-                print("1")
+            # 1-1. Volume Control Mode
+            elif fingers1[1:5] == [0, 0, 0, 1]:
+                if fingers1[0] == 1:
+                    print("Volume Control Mode (Active)")
+                    mvuLength, mvuInfo, img = detector.findDistance(lmList1[4], lmList1[6], img)
+                    mvdLength, mvdInfo, img = detector.findDistance(lmList1[4], lmList1[7], img)
+                    # mvmLength, mvmInfo, img = detector.findDistance(lmList1[4], lmList1[8], img)
 
-            # 2. Control Mode
-            elif fingers1.count(1) == 2:
-                print("2")
+                    if mvuLength < 40:
+                        cv2.circle(img, (mvuInfo[4], mvuInfo[5]), circleRadius3, blue, cv2.FILLED)
+                        print("volume up")
+                        keyboard.press(Key.media_volume_up)
+                        time.sleep(volTime)
+                        keyboard.release(Key.media_volume_up)
 
-            # 3. Control Mode
-            elif fingers1.count(1) == 3:
-                print("3")
+                    if mvdLength < 45:
+                        cv2.circle(img, (mvdInfo[4], mvdInfo[5]), circleRadius3, blue, cv2.FILLED)
+                        print("volume down")
+                        keyboard.press(Key.media_volume_down)
+                        time.sleep(volTime)
+                        keyboard.release(Key.media_volume_down)
 
-            # 4. Control Mode
-            elif fingers1.count(1) == 4:
-                print("4")
+                    # if mvmLength < 40:
+                    #     print("mute")
+                    #     cv2.circle(img, (mvmInfo[4], mvmInfo[5]), circleRadius3, blue, cv2.FILLED)
+                    #     keyboard.press(Key.media_volume_mute)
+                    #     time.sleep(volTime)
+                    #     keyboard.release(Key.media_volume_mute)
 
-            # 5. Control Mode
-            else:
-                print("5")
+                else:
+                    print("Volume Control Mode (Inactive)")
 
-            # TODO: implement 1 hand quit sign
-            if fingers1[3:5] == [0, 0]:
-                print("Quit Mode")
-                if fingers1[0:3] == [1, 0, 0]:
-                    print("Quit!")  # for testing
+            # 1-2. Media Control Mode
+            elif fingers1[1:5] == [0, 0, 1, 1]:
+                if fingers1[0] == 1:
+                    print("Media Control Mode (Active)")
+                else:
+                    print("Media Control Mode (Inactive)")
 
-        # two hands detected 
+            # 1-3. Page Control Mode
+            elif fingers1[1:5] == [0, 1, 1, 1]:
+                if fingers1[0] == 1:
+                    print("Page Control Mode (Active)")
+                else:
+                    print("Page Control Mode (Inactive)")
+
+            # 1-4. Desktop Control Mode
+            elif fingers1[1:5] == [1, 1, 1, 1]:
+                if fingers1[0] == 1:
+                    print("Desktop Control Mode (Active)")
+                else:
+                    print("Desktop Control Mode (Inactive)")
+
+        # 2. two hands detected
         if len(hands) == 2:
             # hand 1 
             hand1 = hands[0]
@@ -170,11 +187,21 @@ while True:
 
             print(f"{handType2} Hand, Center = {centerPoint2}, Fingers = {fingers2}")
 
+            # hhLength, hhInfo = detector.findDistance(centerPoint1, centerPoint2, img, draw=False)
+            #
+            # print(hhLength)
+            # if hhLength < 200:
+            #     print("exit")
+            #     exit()
+
             # handType1 is left hand and handType2 is right hand
             if handType1 == "Left" and handType2 == "Right":
+                # 2-0. Idle State Mode
+                if fingers1.count(1) == 0:
+                    print("Idle State Mode")
 
-                # 1. Volume Control Mode
-                if fingers1.count(1) == 1:
+                # 2-1. Volume Control Mode
+                elif fingers1.count(1) == 1:
                     if fingers2[2:5] == [0, 0, 0] and fingers2 != [0, 0, 0, 0, 0]:
                         print("Volume Control Mode (Active)")
                         mvdLength, mvdInfo, img = detector.findDistance(lmList2[8], lmList2[3], img)
@@ -205,7 +232,7 @@ while True:
                     else:
                         print("Volume Control Mode (Inactive)")
 
-                # 2. Media Control Mode
+                # 2-2. Media Control Mode
                 elif fingers1.count(1) == 2:
                     if fingers2[2:5] == [0, 0, 0] and fingers2 != [0, 0, 0, 0, 0]:
                         print("Media Control Mode (Active)")
@@ -237,7 +264,7 @@ while True:
                     else:
                         print("Media Control Mode (Inactive)")
 
-                # 3. Page Control Mode
+                # 2-3. Page Control Mode
                 elif fingers1.count(1) == 3:
                     if fingers2[2:5] == [0, 0, 0] and fingers2 != [0, 0, 0, 0, 0]:
                         print("Page Control Mode (Active)")
@@ -277,14 +304,14 @@ while True:
                     else:
                         print("Page Control Mode (Inactive)")
 
-                # 4. Control Mode
+                # 2-4. Control Mode
                 elif fingers1.count(1) == 4:
                     if fingers2[2:5] == [0, 0, 0] and fingers2 != [0, 0, 0, 0, 0]:
-                        print("4 Control Mode (Active)")
+                        print("Control Mode (Active)")
                     else:
-                        print("4 Control Mode (Inactive)")
+                        print("Control Mode (Inactive)")
 
-                # 5. Desktop Control Mode
+                # 2-5. Desktop Control Mode
                 elif fingers1.count(1) == 5:
                     if fingers2[2:5] == [0, 0, 0] and fingers2 != [0, 0, 0, 0, 0]:
                         print("Desktop Control Mode (Active)")
@@ -315,14 +342,6 @@ while True:
                             asRun(sdScript)
                     else:
                         print("Desktop Control Mode (Inactive)")
-
-                # 0. Idle State Mode
-                else:
-                    print("Idle State Mode")
-
-            # TODO: fix hand type flipping issue
-            # e.g. handType1 = right, handType2 = left
-            # set hand types accordingly
 
             print("")
 

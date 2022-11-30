@@ -60,6 +60,7 @@ class HandDetector:
         Finds hands in a BGR image.
         :param img: Image to find the hands in.
         :param draw: Flag to draw the output on the image.
+        :param flipType:
         :return: Image with or without drawings
         """
         imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
@@ -174,7 +175,8 @@ class HandDetector:
                     fingers.append(0)
         return fingers
 
-    def findDistance(self, p1, p2, img=None):
+    # noinspection PyMethodMayBeStatic
+    def findDistance(self, p1, p2, img=None, draw=True):
         """
         Find the distance between two landmarks based on their
         index numbers.
@@ -192,11 +194,12 @@ class HandDetector:
         cx, cy = (x1 + x2) // 2, (y1 + y2) // 2
         length = math.hypot(x2 - x1, y2 - y1)
         info = (x1, y1, x2, y2, cx, cy)
-        if img is not None:
+        if draw is True:
             cv2.circle(img, (x1, y1), circleRadius1, blue, cv2.FILLED)
             cv2.circle(img, (x2, y2), circleRadius1, blue, cv2.FILLED)
             cv2.line(img, (x1, y1), (x2, y2), blue, 3)
             cv2.circle(img, (cx, cy), circleRadius1, blue, cv2.FILLED)
+
             return length, info, img
         else:
             return length, info
