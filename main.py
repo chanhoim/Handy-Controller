@@ -45,14 +45,16 @@ purple = (255, 0, 255)
 
 # time variables
 pTime = 0
-volTime = 0.3
+volTime = 0.1
 medTime = 0.4  # 0.1 ~ 0.5
 scrTime = 0.3
 dktTime = 0.1
 
 # finger to finger distances
-tiDist = 30
-tmDist = 20
+tiDist1 = 25
+tmDist1 = 35
+tiDist2 = 25
+tmDist2 = 35
 
 # input sources
 camInput = 0  # 0 for webcam, 1 for external source
@@ -120,14 +122,15 @@ while True:
                     mvdLength, mvdInfo, img = detector.findDistance(lmList1[4], lmList1[7], img)
                     # mvmLength, mvmInfo, img = detector.findDistance(lmList1[4], lmList1[8], img)
 
-                    if mvuLength < 40:
+                    print(mvuLength, mvuInfo[4], mvuInfo[5])
+                    if mvuLength < tiDist1:
                         cv2.circle(img, (mvuInfo[4], mvuInfo[5]), circleRadius3, blue, cv2.FILLED)
                         print("volume up")
                         keyboard.press(Key.media_volume_up)
                         time.sleep(volTime)
                         keyboard.release(Key.media_volume_up)
 
-                    if mvdLength < 45:
+                    if mvdLength < tiDist1:
                         cv2.circle(img, (mvdInfo[4], mvdInfo[5]), circleRadius3, blue, cv2.FILLED)
                         print("volume down")
                         keyboard.press(Key.media_volume_down)
@@ -209,21 +212,21 @@ while True:
 
                         mvmLength, mvmInfo, img = detector.findDistance(lmList2[4], lmList2[11], img)
 
-                        if mvdLength < tiDist:
+                        if mvdLength < tiDist2:
                             cv2.circle(img, (mvdInfo[4], mvdInfo[5]), circleRadius3, blue, cv2.FILLED)
                             print("volume down")
                             keyboard.press(Key.media_volume_down)
                             time.sleep(volTime)
                             keyboard.release(Key.media_volume_down)
 
-                        if mvuLength < tiDist:
+                        if mvuLength < tiDist2:
                             cv2.circle(img, (mvuInfo[4], mvuInfo[5]), circleRadius3, blue, cv2.FILLED)
                             print("volume up")
                             keyboard.press(Key.media_volume_up)
                             time.sleep(volTime)
                             keyboard.release(Key.media_volume_up)
 
-                        if mvmLength < tmDist:
+                        if mvmLength < tmDist2:
                             print("mute")
                             cv2.circle(img, (mvmInfo[4], mvmInfo[5]), circleRadius3, blue, cv2.FILLED)
                             keyboard.press(Key.media_volume_mute)
@@ -241,21 +244,21 @@ while True:
 
                         mppLength, mppInfo, img = detector.findDistance(lmList2[4], lmList2[11], img)
 
-                        if mpLength < tiDist:
+                        if mpLength < tiDist2:
                             cv2.circle(img, (mpInfo[4], mpInfo[5]), circleRadius3, blue, cv2.FILLED)
                             print("play previous")
                             keyboard.press(Key.media_previous)
                             time.sleep(medTime)
                             keyboard.release(Key.media_previous)
 
-                        if mnLength < tiDist:
+                        if mnLength < tiDist2:
                             cv2.circle(img, (mnInfo[4], mnInfo[5]), circleRadius3, blue, cv2.FILLED)
                             print("play next")
                             keyboard.press(Key.media_next)
                             time.sleep(medTime)
                             keyboard.release(Key.media_next)
 
-                        if mppLength < tmDist:
+                        if mppLength < tmDist2:
                             print("play/pause")
                             cv2.circle(img, (mppInfo[4], mppInfo[5]), circleRadius3, blue, cv2.FILLED)
                             keyboard.press(Key.media_play_pause)
@@ -274,28 +277,28 @@ while True:
                         phLength, phInfo, img = detector.findDistance(lmList2[4], lmList2[10], img)
                         peLength, peInfo, img = detector.findDistance(lmList2[4], lmList2[11], img)
 
-                        if pdLength < tiDist:
+                        if pdLength < tiDist2:
                             cv2.circle(img, (pdInfo[4], pdInfo[5]), circleRadius3, blue, cv2.FILLED)
                             print("page down")
                             keyboard.press(Key.page_down)
                             time.sleep(scrTime)
                             keyboard.release(Key.page_down)
 
-                        if puLength < tiDist:
+                        if puLength < tiDist2:
                             cv2.circle(img, (puInfo[4], puInfo[5]), circleRadius3, blue, cv2.FILLED)
                             print("page up")
                             keyboard.press(Key.page_up)
                             time.sleep(scrTime)
                             keyboard.release(Key.page_up)
 
-                        if phLength < tmDist:
+                        if phLength < tmDist2:
                             print("home")
                             cv2.circle(img, (phInfo[4], phInfo[5]), circleRadius3, blue, cv2.FILLED)
                             keyboard.press(Key.home)
                             time.sleep(scrTime)
                             keyboard.release(Key.home)
 
-                        if peLength < tmDist:
+                        if peLength < tmDist2:
                             print("end")
                             cv2.circle(img, (peInfo[4], peInfo[5]), circleRadius3, blue, cv2.FILLED)
                             keyboard.press(Key.end)
@@ -321,25 +324,29 @@ while True:
                         mcLength, mcInfo, img = detector.findDistance(lmList2[4], lmList2[10], img)
                         sdLength, sdInfo, img = detector.findDistance(lmList2[4], lmList2[11], img)
 
-                        if pdLength < tiDist:
+                        if pdLength < tiDist2:
                             print("previous desktop")
                             cv2.circle(img, (pdInfo[4], pdInfo[5]), circleRadius3, blue, cv2.FILLED)
-                            asRun(pdScript)
+                            if os == "Darwin":
+                                asRun(pdScript)
 
-                        if ndLength < tiDist:
+                        if ndLength < tiDist2:
                             print("next desktop")
                             cv2.circle(img, (ndInfo[4], ndInfo[5]), circleRadius3, blue, cv2.FILLED)
-                            asRun(ndScript)
+                            if os == "Darwin":
+                                asRun(ndScript)
 
-                        if mcLength < tmDist:
+                        if mcLength < tmDist2:
                             print("mission control")
                             cv2.circle(img, (mcInfo[4], mcInfo[5]), circleRadius3, blue, cv2.FILLED)
-                            asRun(mcScript)
+                            if os == "Darwin":
+                                asRun(mcScript)
 
-                        if sdLength < tmDist:
+                        if sdLength < tmDist2:
                             print("show desktop")
                             cv2.circle(img, (sdInfo[4], sdInfo[5]), circleRadius3, blue, cv2.FILLED)
-                            asRun(sdScript)
+                            if os == "Darwin":
+                                asRun(sdScript)
                     else:
                         print("Desktop Control Mode (Inactive)")
 
