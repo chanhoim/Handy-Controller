@@ -20,4 +20,5 @@ pyparsing==3.0.9
 python-dateutil==2.8.2
 runcmd==2020.12.3
 six==1.16.0
-pynput~=1.7.6
+pynput==1.7.6
+PyAutoGUI==0.9.53
