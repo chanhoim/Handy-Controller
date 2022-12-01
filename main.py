@@ -6,15 +6,16 @@ from HandTrackingModule import HandDetector
 from pynput.keyboard import Key, Controller
 import pyautogui
 import numpy as np
+import screen_brightness_control as sbc
 
 keyboard = Controller()
 
 # check operating system
-os = platform.system()  # Windows / Darwin(Mac)
+myOS = platform.system()  # Windows / Darwin(Mac)
 
-if os == "Windows":
+if myOS == "Windows":
     print("Program running on Windows")
-elif os == "Darwin":
+elif myOS == "Darwin":
     print("Program running on MacOSX")
 else:
     print("Program running on other OSs")
@@ -46,28 +47,27 @@ white = (255, 255, 255)
 purple = (255, 0, 255)
 
 # time variables
-pTime = 0
-volTime = 0.1
-medTime = 0.4  # 0.1 ~ 0.5
-scrTime = 0.3
-dktTime = 0.1
-mouTime = 0.3
+pTime = 0  # page control time
+mocTime = 0.25  # mouse control time
+mvcTime = 0.1  # media volume control time
+mdcTime = 0.4  # media control time
+pgcTime = 0.3  # page control time
+dkcTime = 0.1  # desktop control time
 
 # finger to finger distances
-tiDist1 = 20
-tmDist1 = 30
-miDist1 = 35
-
-tiDist2 = 20
-tmDist2 = 30
-miDist2 = 35
+tiDist1 = 30  # thumb - index finger distance
+tmDist1 = 30  # thumb - middle finger distance
+miDist1 = 35  # middle finger - index finger distance
+tiDist2 = 30  # thumb - index finger distance
+tmDist2 = 20  # thumb - middle finger distance
+miDist2 = 35  # middle finger - index finger distance
 
 # input sources
 camInput = 0  # 0 for webcam, 1 for external source
 cap = cv2.VideoCapture(camInput)
 
 # mouse location variables
-smoothening = 7  # smoothening value
+smoothening = 2.5
 plocX, plocY = 0, 0
 clocX, clocY = 0, 0
 camW, camH = 640, 480  # camera size
@@ -77,7 +77,7 @@ cap.set(3, camW)
 cap.set(4, camH)
 
 # new detector object from HandDetector class
-detector = HandDetector(detectionCon=0.8, maxHands=2)
+detector = HandDetector(detectionCon=0.9, maxHands=2)
 
 
 def asRun(aScript):
@@ -127,7 +127,7 @@ while True:
             fingers1 = detector.fingersUp(hand1)
             x1, y1 = lmList1[8][0], lmList1[8][1]  # index finger location
 
-            print(f"{handType1} Hand, Center = {centerPoint1}, Fingers = {fingers1}")
+            # print(f"{handType1} Hand, Center = {centerPoint1}, Fingers = {fingers1}")
 
             cv2.rectangle(img=img, pt1=(frmW, frmH), pt2=(camW - frmW, camH - frmH), color=purple,
                           thickness=lineThickness2)
@@ -137,8 +137,7 @@ while True:
                 print("Idle State Mode")
 
             # 1. Mouse Control Mode
-            if fingers1[1] == 1:
-                print("Mouse Move Mode (Active)")
+            if fingers1[1:3] == [1, 1] and fingers1 != [1, 1, 1, 1, 1]:
                 x3 = np.interp(x1, (frmW, camW - frmW), (0, scrW))
                 y3 = np.interp(y1, (frmH, camH - frmH), (0, scrH))
 
@@ -150,17 +149,42 @@ while True:
                 # print(x3, y3)  # index finger location in  window
 
                 pyautogui.moveTo(clocX, clocY)
-                cv2.circle(img, (x1, y1), circleRadius3, green, cv2.FILLED)
+                cv2.circle(img, (x1, y1), circleRadius2, blue, cv2.FILLED)
                 plocX, plocY = clocX, clocY
 
-                # mouse click mode
-                if fingers1[0] == 1:
-                    mcLength, mcInfo, img = detector.findDistance(lmList1[4], lmList1[12], img)
-                    if mcLength < 35:
+                mcLength, mcInfo, img = detector.findDistance(lmList1[8], lmList1[12], img)
+
+                # mouse single click mode
+                if fingers1 == [0, 1, 1, 0, 0]:
+                    print("Mouse Click Mode (Active)")
+                    if mcLength < miDist1:
                         print("click")
                         cv2.circle(img, (mcInfo[4], mcInfo[5]), circleRadius2, purple, cv2.FILLED)
-                        pyautogui.click()
-                        time.sleep(mouTime)
+                        pyautogui.click(interval=mocTime)
+
+                # mouse double click mode
+                if fingers1[0] == 1 and fingers1[4] == 0:
+                    print("Mouse Double Click Mode (Active)")
+                    if mcLength < miDist1:
+                        print("double click")
+                        cv2.circle(img, (mcInfo[4], mcInfo[5]), circleRadius2, purple, cv2.FILLED)
+                        pyautogui.hotkey('command', 'down', interval=mocTime)  # mimics double click
+
+                # go back mode
+                if fingers1[0] == 0 and fingers1[4] == 1:
+                    print("Go Back Mode (Active)")
+                    if mcLength < miDist1:
+                        print("go back")
+                        cv2.circle(img, (mcInfo[4], mcInfo[5]), circleRadius2, purple, cv2.FILLED)
+                        pyautogui.hotkey('command', 'up', interval=mocTime)  # mimics go back
+
+                # mouse right click mode
+                if fingers1[0] == 1 and fingers1[4] == 1:
+                    print("Mouse Right Click Mode (Active)")
+                    if mcLength < miDist1:
+                        print("right click")
+                        cv2.circle(img, (mcInfo[4], mcInfo[5]), circleRadius2, purple, cv2.FILLED)
+                        pyautogui.rightClick(interval=mocTime)
 
             # 1-1. Volume Control Mode
             if fingers1[1:5] == [0, 0, 0, 1]:
@@ -170,26 +194,26 @@ while True:
                     mvdLength, mvdInfo, img = detector.findDistance(lmList1[4], lmList1[7], img)
                     # mvmLength, mvmInfo, img = detector.findDistance(lmList1[4], lmList1[8], img)
 
-                    print(mvuLength, mvuInfo[4], mvuInfo[5])
+                    # print(mvuLength, mvuInfo[4], mvuInfo[5])
                     if mvuLength < tiDist1:
                         cv2.circle(img, (mvuInfo[4], mvuInfo[5]), circleRadius3, blue, cv2.FILLED)
                         print("volume up")
                         keyboard.press(Key.media_volume_up)
-                        time.sleep(volTime)
+                        time.sleep(mvcTime)
                         keyboard.release(Key.media_volume_up)
 
                     if mvdLength < tiDist1:
                         cv2.circle(img, (mvdInfo[4], mvdInfo[5]), circleRadius3, blue, cv2.FILLED)
                         print("volume down")
                         keyboard.press(Key.media_volume_down)
-                        time.sleep(volTime)
+                        time.sleep(mvcTime)
                         keyboard.release(Key.media_volume_down)
 
                     # if mvmLength < 40:
                     #     print("mute")
                     #     cv2.circle(img, (mvmInfo[4], mvmInfo[5]), circleRadius3, blue, cv2.FILLED)
                     #     keyboard.press(Key.media_volume_mute)
-                    #     time.sleep(volTime)
+                    #     time.sleep(mvcTime)
                     #     keyboard.release(Key.media_volume_mute)
 
                 else:
@@ -226,7 +250,7 @@ while True:
             handType1 = hand1["type"]  # hand type (left or right)
             fingers1 = detector.fingersUp(hand1)
 
-            print(f"{handType1} Hand, Center = {centerPoint1}, Fingers = {fingers1}")
+            # print(f"{handType1} Hand, Center = {centerPoint1}, Fingers = {fingers1}")
 
             # hand 2
             hand2 = hands[1]
@@ -236,8 +260,9 @@ while True:
             handType2 = hand2["type"]  # hand type (left or right)
             fingers2 = detector.fingersUp(hand2)
 
-            print(f"{handType2} Hand, Center = {centerPoint2}, Fingers = {fingers2}")
+            # print(f"{handType2} Hand, Center = {centerPoint2}, Fingers = {fingers2}")
 
+            # TODO: implement quit feature
             # hhLength, hhInfo = detector.findDistance(centerPoint1, centerPoint2, img, draw=False)
             #
             # print(hhLength)
@@ -255,30 +280,30 @@ while True:
                 elif fingers1.count(1) == 1:
                     if fingers2[2:5] == [0, 0, 0] and fingers2 != [0, 0, 0, 0, 0]:
                         print("Volume Control Mode (Active)")
-                        mvdLength, mvdInfo, img = detector.findDistance(lmList2[8], lmList2[3], img)
-                        mvuLength, mvuInfo, img = detector.findDistance(lmList2[8], lmList2[4], img)
+                        mvuLength, mvuInfo, img = detector.findDistance(lmList2[4], lmList2[10], img)
+                        mvdLength, mvdInfo, img = detector.findDistance(lmList2[4], lmList2[11], img)
 
-                        mvmLength, mvmInfo, img = detector.findDistance(lmList2[4], lmList2[11], img)
+                        mvmLength, mvmInfo, img = detector.findDistance(lmList2[8], lmList2[4], img)
 
-                        if mvdLength < tiDist2:
+                        if mvdLength < tmDist2:
                             cv2.circle(img, (mvdInfo[4], mvdInfo[5]), circleRadius3, blue, cv2.FILLED)
                             print("volume down")
                             keyboard.press(Key.media_volume_down)
-                            time.sleep(volTime)
+                            time.sleep(mvcTime)
                             keyboard.release(Key.media_volume_down)
 
-                        if mvuLength < tiDist2:
+                        if mvuLength < tmDist2:
                             cv2.circle(img, (mvuInfo[4], mvuInfo[5]), circleRadius3, blue, cv2.FILLED)
                             print("volume up")
                             keyboard.press(Key.media_volume_up)
-                            time.sleep(volTime)
+                            time.sleep(mvcTime)
                             keyboard.release(Key.media_volume_up)
 
-                        if mvmLength < tmDist2:
+                        if mvmLength < tiDist2:
                             print("mute")
                             cv2.circle(img, (mvmInfo[4], mvmInfo[5]), circleRadius3, blue, cv2.FILLED)
                             keyboard.press(Key.media_volume_mute)
-                            time.sleep(volTime)
+                            time.sleep(4 * mvcTime)
                             keyboard.release(Key.media_volume_mute)
                     else:
                         print("Volume Control Mode (Inactive)")
@@ -287,30 +312,30 @@ while True:
                 elif fingers1.count(1) == 2:
                     if fingers2[2:5] == [0, 0, 0] and fingers2 != [0, 0, 0, 0, 0]:
                         print("Media Control Mode (Active)")
-                        mpLength, mpInfo, img = detector.findDistance(lmList2[8], lmList2[3], img)
-                        mnLength, mnInfo, img = detector.findDistance(lmList2[8], lmList2[4], img)
+                        mnLength, mnInfo, img = detector.findDistance(lmList2[4], lmList2[10], img)
+                        mpLength, mpInfo, img = detector.findDistance(lmList2[4], lmList2[11], img)
 
-                        mppLength, mppInfo, img = detector.findDistance(lmList2[4], lmList2[11], img)
+                        mppLength, mppInfo, img = detector.findDistance(lmList2[8], lmList2[4], img)
 
-                        if mpLength < tiDist2:
+                        if mpLength < tmDist2:
                             cv2.circle(img, (mpInfo[4], mpInfo[5]), circleRadius3, blue, cv2.FILLED)
                             print("play previous")
                             keyboard.press(Key.media_previous)
-                            time.sleep(medTime)
+                            time.sleep(mdcTime)
                             keyboard.release(Key.media_previous)
 
-                        if mnLength < tiDist2:
+                        if mnLength < tmDist2:
                             cv2.circle(img, (mnInfo[4], mnInfo[5]), circleRadius3, blue, cv2.FILLED)
                             print("play next")
                             keyboard.press(Key.media_next)
-                            time.sleep(medTime)
+                            time.sleep(mdcTime)
                             keyboard.release(Key.media_next)
 
-                        if mppLength < tmDist2:
+                        if mppLength < tiDist2:
                             print("play/pause")
                             cv2.circle(img, (mppInfo[4], mppInfo[5]), circleRadius3, blue, cv2.FILLED)
                             keyboard.press(Key.media_play_pause)
-                            time.sleep(medTime)
+                            time.sleep(mdcTime)
                             keyboard.release(Key.media_play_pause)
                     else:
                         print("Media Control Mode (Inactive)")
@@ -319,38 +344,34 @@ while True:
                 elif fingers1.count(1) == 3:
                     if fingers2[2:5] == [0, 0, 0] and fingers2 != [0, 0, 0, 0, 0]:
                         print("Page Control Mode (Active)")
-                        pdLength, pdInfo, img = detector.findDistance(lmList2[8], lmList2[3], img)
-                        puLength, puInfo, img = detector.findDistance(lmList2[8], lmList2[4], img)
+                        puLength, puInfo, img = detector.findDistance(lmList2[4], lmList2[10], img)
+                        pdLength, pdInfo, img = detector.findDistance(lmList2[4], lmList2[11], img)
 
-                        phLength, phInfo, img = detector.findDistance(lmList2[4], lmList2[10], img)
-                        peLength, peInfo, img = detector.findDistance(lmList2[4], lmList2[11], img)
+                        phLength, phInfo, img = detector.findDistance(lmList2[8], lmList2[4], img)
+                        peLength, peInfo, img = detector.findDistance(lmList2[8], lmList2[3], img)
 
-                        if pdLength < tiDist2:
+                        if pdLength < tmDist2:
                             cv2.circle(img, (pdInfo[4], pdInfo[5]), circleRadius3, blue, cv2.FILLED)
                             print("page down")
-                            keyboard.press(Key.page_down)
-                            time.sleep(scrTime)
-                            keyboard.release(Key.page_down)
+                            pyautogui.scroll(-10)
 
-                        if puLength < tiDist2:
+                        if puLength < tmDist2:
                             cv2.circle(img, (puInfo[4], puInfo[5]), circleRadius3, blue, cv2.FILLED)
                             print("page up")
-                            keyboard.press(Key.page_up)
-                            time.sleep(scrTime)
-                            keyboard.release(Key.page_up)
+                            pyautogui.scroll(10)
 
-                        if phLength < tmDist2:
+                        if phLength < tiDist2:
                             print("home")
                             cv2.circle(img, (phInfo[4], phInfo[5]), circleRadius3, blue, cv2.FILLED)
                             keyboard.press(Key.home)
-                            time.sleep(scrTime)
+                            time.sleep(pgcTime)
                             keyboard.release(Key.home)
 
-                        if peLength < tmDist2:
+                        if peLength < tiDist2:
                             print("end")
                             cv2.circle(img, (peInfo[4], peInfo[5]), circleRadius3, blue, cv2.FILLED)
                             keyboard.press(Key.end)
-                            time.sleep(scrTime)
+                            time.sleep(pgcTime)
                             keyboard.release(Key.end)
                     else:
                         print("Page Control Mode (Inactive)")
@@ -359,20 +380,21 @@ while True:
                 elif fingers1.count(1) == 4:
                     if fingers2[2:5] == [0, 0, 0] and fingers2 != [0, 0, 0, 0, 0]:
                         print("Brightness Control Mode (Active)")
-                        bdLength, bdInfo, img = detector.findDistance(lmList2[8], lmList2[3], img)
-                        buLength, buInfo, img = detector.findDistance(lmList2[8], lmList2[4], img)
+                        buLength, buInfo, img = detector.findDistance(lmList2[4], lmList2[10], img)
+                        bdLength, bdInfo, img = detector.findDistance(lmList2[4], lmList2[11], img)
 
-                        if bdLength < tiDist2:
+                        # TODO: implement brightness feature
+                        if bdLength < tmDist2:
                             print("brightness down")
                             cv2.circle(img, (bdInfo[4], bdInfo[5]), circleRadius3, blue, cv2.FILLED)
-                            if os == "Darwin":
-                                asRun(bdScript)
+                            if myOS == "Windows":
+                                sbc.set_brightness('-10')
 
-                        if buLength < tiDist2:
+                        if buLength < tmDist2:
                             print("brightness up")
                             cv2.circle(img, (buInfo[4], buInfo[5]), circleRadius3, blue, cv2.FILLED)
-                            if os == "Darwin":
-                                asRun(buScript)
+                            if myOS == "Windows":
+                                sbc.set_brightness('+10')
                     else:
                         print("Brightness Control Mode (Inactive)")
 
@@ -380,34 +402,34 @@ while True:
                 elif fingers1.count(1) == 5:
                     if fingers2[2:5] == [0, 0, 0] and fingers2 != [0, 0, 0, 0, 0]:
                         print("Desktop Control Mode (Active)")
-                        ndLength, ndInfo, img = detector.findDistance(lmList2[8], lmList2[3], img)
-                        pdLength, pdInfo, img = detector.findDistance(lmList2[8], lmList2[4], img)
+                        ndLength, ndInfo, img = detector.findDistance(lmList2[4], lmList2[10], img)
+                        pdLength, pdInfo, img = detector.findDistance(lmList2[4], lmList2[11], img)
 
-                        mcLength, mcInfo, img = detector.findDistance(lmList2[4], lmList2[10], img)
-                        sdLength, sdInfo, img = detector.findDistance(lmList2[4], lmList2[11], img)
+                        mcLength, mcInfo, img = detector.findDistance(lmList2[8], lmList2[4], img)
+                        sdLength, sdInfo, img = detector.findDistance(lmList2[8], lmList2[3], img)
 
-                        if pdLength < tiDist2:
+                        if pdLength < tmDist2:
                             print("previous desktop")
                             cv2.circle(img, (pdInfo[4], pdInfo[5]), circleRadius3, blue, cv2.FILLED)
-                            if os == "Darwin":
+                            if myOS == "Darwin":
                                 asRun(pdScript)
 
-                        if ndLength < tiDist2:
+                        if ndLength < tmDist2:
                             print("next desktop")
                             cv2.circle(img, (ndInfo[4], ndInfo[5]), circleRadius3, blue, cv2.FILLED)
-                            if os == "Darwin":
+                            if myOS == "Darwin":
                                 asRun(ndScript)
 
-                        if mcLength < tmDist2:
+                        if mcLength < tiDist2:
                             print("mission control")
                             cv2.circle(img, (mcInfo[4], mcInfo[5]), circleRadius3, blue, cv2.FILLED)
-                            if os == "Darwin":
+                            if myOS == "Darwin":
                                 asRun(mcScript)
 
-                        if sdLength < tmDist2:
+                        if sdLength < tiDist2:
                             print("show desktop")
                             cv2.circle(img, (sdInfo[4], sdInfo[5]), circleRadius3, blue, cv2.FILLED)
-                            if os == "Darwin":
+                            if myOS == "Darwin":
                                 asRun(sdScript)
                     else:
                         print("Desktop Control Mode (Inactive)")
@@ -422,4 +444,5 @@ while True:
                 green, lineThickness1)
 
     cv2.imshow("main", img)
-    cv2.waitKey(1)
+    if cv2.waitKey(1) == ord('q'):
+        break
