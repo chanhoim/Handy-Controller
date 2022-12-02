@@ -28,7 +28,7 @@ circleRadius1 = 5
 circleRadius2 = 10
 circleRadius3 = 15
 
-# font variable
+# font variables
 fontSize1 = 1.5
 fontThickness1 = 2  # integer only
 fontSize2 = 2.5
@@ -88,6 +88,7 @@ def asRun(aScript):
     osa = subprocess.Popen(['osascript', '-'],
                            stdin=subprocess.PIPE,
                            stdout=subprocess.PIPE)
+
     return osa.communicate(bytes(aScript, 'UTF-8'))[0]
 
 
@@ -96,6 +97,7 @@ def asQuote(aStr):
     Return the AppleScript equivalent of the given string.
     """
     aStr = aStr.replace('"', '" & quote & "')
+
     return '"{}"'.format(aStr)
 
 
@@ -116,9 +118,11 @@ while True:
         hands, img = detector.findHands(img)
 
     if hands:
-        # 1. Single Hand Detected
         if len(hands) == 1:
-            # hand 1
+            """
+            1. Single Hand Detected.
+            """
+            # 1st hand info
             hand1 = hands[0]
             lmList1 = hand1["lmList"]  # list of 21 landmarks of points
             bbox1 = hand1["bbox"]  # bounding box info (x, y, w, h)
@@ -132,12 +136,16 @@ while True:
             cv2.rectangle(img=img, pt1=(frmW, frmH), pt2=(camW - frmW, camH - frmH), color=purple,
                           thickness=lineThickness2)
 
-            # 1-0-0. Idle State Mode
             if fingers1[1:5] == [0, 0, 0, 0]:
+                '''
+                1-0-0. Idle State Mode.
+                '''
                 print("Idle State Mode")
 
-            # 1. Mouse Control Mode
             if fingers1[1:3] == [1, 1] and fingers1 != [1, 1, 1, 1, 1]:
+                '''
+                1. Mouse Control Mode.
+                '''
                 x3 = np.interp(x1, (frmW, camW - frmW), (0, scrW))
                 y3 = np.interp(y1, (frmH, camH - frmH), (0, scrH))
 
@@ -186,8 +194,14 @@ while True:
                         cv2.circle(img, (mcInfo[4], mcInfo[5]), circleRadius2, purple, cv2.FILLED)
                         pyautogui.rightClick(interval=mocTime)
 
-            # 1-1. Volume Control Mode
+                # TODO: implement mouse drag and drop mode
+                # mouse drag and drop mode
+
             if fingers1[1:5] == [0, 0, 0, 1]:
+                # TODO: implement two handed features in single handed mode
+                '''
+                1-1. Volume Control Mode
+                '''
                 if fingers1[0] == 1:
                     print("Volume Control Mode (Active)")
                     mvuLength, mvuInfo, img = detector.findDistance(lmList1[4], lmList1[6], img)
@@ -219,30 +233,38 @@ while True:
                 else:
                     print("Volume Control Mode (Inactive)")
 
-            # 1-2. Media Control Mode
             if fingers1[1:5] == [0, 0, 1, 1]:
+                '''
+                1-2. Media Control Mode
+                '''
                 if fingers1[0] == 1:
                     print("Media Control Mode (Active)")
                 else:
                     print("Media Control Mode (Inactive)")
 
-            # 1-3. Page Control Mode
             if fingers1[1:5] == [0, 1, 1, 1]:
+                '''
+                1-3. Page Control Mode
+                '''
                 if fingers1[0] == 1:
                     print("Page Control Mode (Active)")
                 else:
                     print("Page Control Mode (Inactive)")
 
-            # 1-4. Desktop Control Mode
             if fingers1[1:5] == [1, 1, 1, 1]:
+                '''
+                1-4. Desktop Control Mode
+                '''
                 if fingers1[0] == 1:
                     print("Desktop Control Mode (Active)")
                 else:
                     print("Desktop Control Mode (Inactive)")
 
-        # 2. Two Hands Detected
         if len(hands) == 2:
-            # hand 1 
+            """
+            2. Two Hands Detected
+            """
+            # 1st hand info
             hand1 = hands[0]
             lmList1 = hand1["lmList"]  # list of 21 landmarks of points
             bbox1 = hand1["bbox"]  # bounding box info (x, y, w, h)
@@ -252,7 +274,7 @@ while True:
 
             # print(f"{handType1} Hand, Center = {centerPoint1}, Fingers = {fingers1}")
 
-            # hand 2
+            # 2nd hand info
             hand2 = hands[1]
             lmList2 = hand2["lmList"]  # list of 21 landmarks of points
             bbox2 = hand2["bbox"]  # bounding box info (x, y, w, h)
@@ -272,12 +294,16 @@ while True:
 
             # handType1 is left hand and handType2 is right hand
             if handType1 == "Left" and handType2 == "Right":
-                # 2-0. Idle State Mode
+                '''
+                2-0. Idle State Mode
+                '''
                 if fingers1.count(1) == 0:
                     print("Idle State Mode")
 
-                # 2-1. Volume Control Mode
                 elif fingers1.count(1) == 1:
+                    '''
+                    2-1. Volume Control Mode
+                    '''
                     if fingers2[2:5] == [0, 0, 0] and fingers2 != [0, 0, 0, 0, 0]:
                         print("Volume Control Mode (Active)")
                         mvuLength, mvuInfo, img = detector.findDistance(lmList2[4], lmList2[10], img)
@@ -308,8 +334,10 @@ while True:
                     else:
                         print("Volume Control Mode (Inactive)")
 
-                # 2-2. Media Control Mode
                 elif fingers1.count(1) == 2:
+                    '''
+                    2-2. Media Control Mode
+                    '''
                     if fingers2[2:5] == [0, 0, 0] and fingers2 != [0, 0, 0, 0, 0]:
                         print("Media Control Mode (Active)")
                         mnLength, mnInfo, img = detector.findDistance(lmList2[4], lmList2[10], img)
@@ -340,8 +368,10 @@ while True:
                     else:
                         print("Media Control Mode (Inactive)")
 
-                # 2-3. Page Control Mode
                 elif fingers1.count(1) == 3:
+                    '''
+                    2-3. Page Control Mode
+                    '''
                     if fingers2[2:5] == [0, 0, 0] and fingers2 != [0, 0, 0, 0, 0]:
                         print("Page Control Mode (Active)")
                         puLength, puInfo, img = detector.findDistance(lmList2[4], lmList2[10], img)
@@ -350,6 +380,7 @@ while True:
                         phLength, phInfo, img = detector.findDistance(lmList2[8], lmList2[4], img)
                         peLength, peInfo, img = detector.findDistance(lmList2[8], lmList2[3], img)
 
+                        # TODO: fix page control feature (scroll too slow) for Windows
                         if pdLength < tmDist2:
                             cv2.circle(img, (pdInfo[4], pdInfo[5]), circleRadius3, blue, cv2.FILLED)
                             print("page down")
@@ -376,30 +407,57 @@ while True:
                     else:
                         print("Page Control Mode (Inactive)")
 
-                # 2-4. Brightness Control Mode
                 elif fingers1.count(1) == 4:
+                    '''
+                    2-4. Brightness Control Mode
+                    '''
                     if fingers2[2:5] == [0, 0, 0] and fingers2 != [0, 0, 0, 0, 0]:
                         print("Brightness Control Mode (Active)")
                         buLength, buInfo, img = detector.findDistance(lmList2[4], lmList2[10], img)
                         bdLength, bdInfo, img = detector.findDistance(lmList2[4], lmList2[11], img)
 
-                        # TODO: implement brightness feature
+                        bMaxLength, bMaxInfo, img = detector.findDistance(lmList2[8], lmList2[4], img)
+                        bMinLength, bMinInfo, img = detector.findDistance(lmList2[8], lmList2[3], img)
+
+                        # TODO: fix and implement brightness feature for Windows and MacOSX, respectively
                         if bdLength < tmDist2:
                             print("brightness down")
                             cv2.circle(img, (bdInfo[4], bdInfo[5]), circleRadius3, blue, cv2.FILLED)
                             if myOS == "Windows":
-                                sbc.set_brightness('-10')
+                                sbc.set_brightness('-10')  # decrease by 10 %
+                            if myOS == "Darwin":
+                                print("not implemented in MacOSX yet")
 
                         if buLength < tmDist2:
                             print("brightness up")
                             cv2.circle(img, (buInfo[4], buInfo[5]), circleRadius3, blue, cv2.FILLED)
                             if myOS == "Windows":
-                                sbc.set_brightness('+10')
+                                sbc.set_brightness('+10')  # increase by 10 %
+                            if myOS == "Darwin":
+                                print("not implemented in MacOSX yet")
+
+                        if bMaxLength < tiDist2:
+                            print("brightness 100%")
+                            cv2.circle(img, (bMaxInfo[4], bMaxInfo[5]), circleRadius3, blue, cv2.FILLED)
+                            if myOS == "Windows":
+                                sbc.set_brightness(100)
+                            if myOS == "Darwin":
+                                print("not implemented in MacOSX yet")
+
+                        if bMinLength < tiDist2:
+                            print("brightness 0%")
+                            cv2.circle(img, (bMinInfo[4], bMinInfo[5]), circleRadius3, blue, cv2.FILLED)
+                            if myOS == "Windows":
+                                sbc.set_brightness(0)
+                            if myOS == "Darwin":
+                                print("not implemented in MacOSX yet")
                     else:
                         print("Brightness Control Mode (Inactive)")
 
-                # 2-5. Desktop Control Mode
                 elif fingers1.count(1) == 5:
+                    '''
+                    2-5. Desktop Control Mode
+                    '''
                     if fingers2[2:5] == [0, 0, 0] and fingers2 != [0, 0, 0, 0, 0]:
                         print("Desktop Control Mode (Active)")
                         ndLength, ndInfo, img = detector.findDistance(lmList2[4], lmList2[10], img)
@@ -408,6 +466,7 @@ while True:
                         mcLength, mcInfo, img = detector.findDistance(lmList2[8], lmList2[4], img)
                         sdLength, sdInfo, img = detector.findDistance(lmList2[8], lmList2[3], img)
 
+                        # TODO: implement desktop feature for Windows
                         if pdLength < tmDist2:
                             print("previous desktop")
                             cv2.circle(img, (pdInfo[4], pdInfo[5]), circleRadius3, blue, cv2.FILLED)
