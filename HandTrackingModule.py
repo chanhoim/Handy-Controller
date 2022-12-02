@@ -42,14 +42,15 @@ class HandDetector:
         :param detectionCon: Minimum Detection Confidence Threshold
         :param minTrackCon: Minimum Tracking Confidence Threshold
         """
-        self.modelComplex = modelComplexity
+
         self.mode = mode
         self.maxHands = maxHands
+        self.modelComplexity = modelComplexity
         self.detectionCon = detectionCon
         self.minTrackCon = minTrackCon
 
         self.mpHands = mp.solutions.hands
-        self.hands = self.mpHands.Hands(self.mode, self.maxHands, self.modelComplex,
+        self.hands = self.mpHands.Hands(self.mode, self.maxHands, self.modelComplexity,
                                         self.detectionCon, self.minTrackCon)
         self.mpDraw = mp.solutions.drawing_utils
         self.tipIds = [4, 8, 12, 16, 20]

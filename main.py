@@ -56,7 +56,7 @@ dkcTime = 0.1  # desktop control time
 # finger to finger distances
 tiDist1 = 30  # thumb - index finger distance
 tmDist1 = 30  # thumb - middle finger distance
-miDist1 = 35  # middle finger - index finger distance
+miDist1 = 25  # middle finger - index finger distance
 tiDist2 = 30  # thumb - index finger distance
 tmDist2 = 20  # thumb - middle finger distance
 miDist2 = 35  # middle finger - index finger distance
@@ -66,11 +66,11 @@ camInput = 0  # 0 for webcam, 1 for external source
 cap = cv2.VideoCapture(camInput)
 
 # mouse location variables
-smoothening = 2.5
+smoothening = 3
 plocX, plocY = 0, 0
 clocX, clocY = 0, 0
 camW, camH = 640, 480  # camera size
-frmW, frmH = 100, 100  # frame size
+frmW, frmH = 150, 100  # frame reduction size
 scrW, scrH = pyautogui.size()  # screen size (1680, 1050)
 cap.set(3, camW)
 cap.set(4, camH)
@@ -99,6 +99,7 @@ while True:
             handType1 = hand1["type"]  # hand type (left or right)
             fingers1 = detector.fingersUp(hand1)
             x1, y1 = lmList1[8][0], lmList1[8][1]  # index finger location
+            # print(x1, y1)
 
             # print(f"{handType1} Hand, Center = {centerPoint1}, Fingers = {fingers1}")
 
