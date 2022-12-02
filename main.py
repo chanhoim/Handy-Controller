@@ -380,12 +380,11 @@ while True:
                         phLength, phInfo, img = detector.findDistance(lmList2[8], lmList2[4], img)
                         peLength, peInfo, img = detector.findDistance(lmList2[8], lmList2[3], img)
 
-                        # TODO: fix page control feature (scroll too slow) for Windows
                         if pdLength < tmDist2:
                             cv2.circle(img, (pdInfo[4], pdInfo[5]), circleRadius3, blue, cv2.FILLED)
                             print("page down")
                             if myOS == "Windows":
-                                pyautogui.scroll(-10)
+                                pyautogui.scroll(-250)
                             if myOS == "Darwin":
                                 pyautogui.scroll(-10)
 
@@ -393,7 +392,7 @@ while True:
                             cv2.circle(img, (puInfo[4], puInfo[5]), circleRadius3, blue, cv2.FILLED)
                             print("page up")
                             if myOS == "Windows":
-                                pyautogui.scroll(10)
+                                pyautogui.scroll(250)
                             if myOS == "Darwin":
                                 pyautogui.scroll(10)
 
