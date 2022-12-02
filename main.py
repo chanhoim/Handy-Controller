@@ -1,6 +1,5 @@
 from cv2 import cv2
 import time
-import subprocess
 import platform
 from HandTrackingModule import HandDetector
 from pynput.keyboard import Key, Controller
