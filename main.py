@@ -79,36 +79,6 @@ cap.set(4, camH)
 # new detector object from HandDetector class
 detector = HandDetector(detectionCon=0.9, maxHands=2)
 
-
-def asRun(aScript):
-    """
-    Run the given AppleScript and
-    return the standard output and error.
-    """
-    osa = subprocess.Popen(['osascript', '-'],
-                           stdin=subprocess.PIPE,
-                           stdout=subprocess.PIPE)
-
-    return osa.communicate(bytes(aScript, 'UTF-8'))[0]
-
-
-def asQuote(aStr):
-    """
-    Return the AppleScript equivalent of the given string.
-    """
-    aStr = aStr.replace('"', '" & quote & "')
-
-    return '"{}"'.format(aStr)
-
-
-# apple scripts for desktop control
-pdScript = '''tell application "System Events" to key code 123 using {control down}'''
-ndScript = '''tell application "System Events" to key code 124 using {control down}'''
-mcScript = '''tell application "System Events" to key code 126 using {control down}'''
-sdScript = '''tell application "System Events" to key code 103'''
-bdScript = '''tell application "System Events" to key code 122'''
-buScript = '''tell application "System Events" to key code 120'''
-
 while True:
     success, img = cap.read()
     if camInput == 0:
@@ -426,7 +396,7 @@ while True:
                             if myOS == "Windows":
                                 sbc.set_brightness('-10')  # decrease by 10 %
                             if myOS == "Darwin":
-                                print("not implemented in MacOSX yet")
+                                pyautogui.hotkey('fn', 'f11')
 
                         if buLength < tmDist2:
                             print("brightness up")
@@ -434,7 +404,7 @@ while True:
                             if myOS == "Windows":
                                 sbc.set_brightness('+10')  # increase by 10 %
                             if myOS == "Darwin":
-                                print("not implemented in MacOSX yet")
+                                pyautogui.hotkey('fn', 'f12')
 
                         if bMaxLength < tiDist2:
                             print("brightness 100%")
@@ -471,25 +441,25 @@ while True:
                             print("previous desktop")
                             cv2.circle(img, (pdInfo[4], pdInfo[5]), circleRadius3, blue, cv2.FILLED)
                             if myOS == "Darwin":
-                                asRun(pdScript)
+                                pyautogui.hotkey('ctrl', 'left')
 
                         if ndLength < tmDist2:
                             print("next desktop")
                             cv2.circle(img, (ndInfo[4], ndInfo[5]), circleRadius3, blue, cv2.FILLED)
                             if myOS == "Darwin":
-                                asRun(ndScript)
+                                pyautogui.hotkey('ctrl', 'right')
 
                         if mcLength < tiDist2:
-                            print("mission control")
+                            print("show applications")
                             cv2.circle(img, (mcInfo[4], mcInfo[5]), circleRadius3, blue, cv2.FILLED)
                             if myOS == "Darwin":
-                                asRun(mcScript)
+                                pyautogui.hotkey('ctrl', 'up')
 
                         if sdLength < tiDist2:
                             print("show desktop")
                             cv2.circle(img, (sdInfo[4], sdInfo[5]), circleRadius3, blue, cv2.FILLED)
                             if myOS == "Darwin":
-                                asRun(sdScript)
+                                pyautogui.hotkey('fn', 'f10')
                     else:
                         print("Desktop Control Mode (Inactive)")
 
