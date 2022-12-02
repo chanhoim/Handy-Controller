@@ -384,12 +384,18 @@ while True:
                         if pdLength < tmDist2:
                             cv2.circle(img, (pdInfo[4], pdInfo[5]), circleRadius3, blue, cv2.FILLED)
                             print("page down")
-                            pyautogui.scroll(-10)
+                            if myOS == "Windows":
+                                pyautogui.scroll(-10)
+                            if myOS == "Darwin":
+                                pyautogui.scroll(-10)
 
                         if puLength < tmDist2:
                             cv2.circle(img, (puInfo[4], puInfo[5]), circleRadius3, blue, cv2.FILLED)
                             print("page up")
-                            pyautogui.scroll(10)
+                            if myOS == "Windows":
+                                pyautogui.scroll(10)
+                            if myOS == "Darwin":
+                                pyautogui.scroll(10)
 
                         if phLength < tiDist2:
                             print("home")
