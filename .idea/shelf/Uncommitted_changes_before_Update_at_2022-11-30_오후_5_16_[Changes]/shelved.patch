@@ -1,0 +1,231 @@
+Index: HandTrackingModule.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>\"\"\"\r\nHand Tracking Module\r\nBy: Computer Vision Zone\r\nWebsite: https://www.computervision.zone/\r\n\"\"\"\r\n\r\nfrom cv2 import cv2\r\nimport mediapipe as mp\r\nimport math\r\n\r\ncircleRadius1 = 5\r\ncircleRadius2 = 10\r\n\r\nfontSize1 = 1.5\r\nfontThickness1 = 2  # integer only\r\n\r\nfontSize2 = 2.5\r\nfontThickness2 = 3  # integer only\r\n\r\nlineThickness2 = 4\r\n\r\nred = (0, 0, 255)\r\ngreen = (0, 255, 0)\r\nblue = (255, 0, 0)\r\nyellow = (0, 255, 255)\r\nwhite = (255, 255, 255)\r\npurple = (255, 0, 255)\r\n\r\n\r\nclass HandDetector:\r\n    \"\"\"\r\n    Finds Hands using the mediapipe library. Exports the landmarks\r\n    in pixel format. Adds extra functionalities like finding how\r\n    many fingers are up or the distance between two fingers. Also\r\n    provides bounding box info of the hand found.\r\n    \"\"\"\r\n\r\n    def __init__(self, mode=False, maxHands=2, detectionCon=0.5, minTrackCon=0.5):\r\n        \"\"\"\r\n        :param mode: In static mode, detection is done on each image: slower\r\n        :param maxHands: Maximum number of hands to detect\r\n        :param detectionCon: Minimum Detection Confidence Threshold\r\n        :param minTrackCon: Minimum Tracking Confidence Threshold\r\n        \"\"\"\r\n        self.mode = mode\r\n        self.maxHands = maxHands\r\n        self.detectionCon = detectionCon\r\n        self.minTrackCon = minTrackCon\r\n\r\n        self.mpHands = mp.solutions.hands\r\n        self.hands = self.mpHands.Hands(self.mode, self.maxHands,\r\n                                        self.detectionCon, self.minTrackCon)\r\n        self.mpDraw = mp.solutions.drawing_utils\r\n        self.tipIds = [4, 8, 12, 16, 20]\r\n        self.fingers = []\r\n        self.lmList = []\r\n\r\n    def findHands(self, img, draw=True, flipType=True):\r\n        \"\"\"\r\n        Finds hands in a BGR image.\r\n        :param img: Image to find the hands in.\r\n        :param draw: Flag to draw the output on the image.\r\n        :param flipType:\r\n        :return: Image with or without drawings\r\n        \"\"\"\r\n        imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)\r\n        self.results = self.hands.process(imgRGB)\r\n        allHands = []\r\n        h, w, c = img.shape\r\n        if self.results.multi_hand_landmarks:\r\n            for handType, handLms in zip(self.results.multi_handedness, self.results.multi_hand_landmarks):\r\n                myHand = {}\r\n                # lmList\r\n                mylmList = []\r\n                xList = []\r\n                yList = []\r\n                for id, lm in enumerate(handLms.landmark):\r\n                    px, py = int(lm.x * w), int(lm.y * h)\r\n                    mylmList.append([px, py])\r\n                    xList.append(px)\r\n                    yList.append(py)\r\n\r\n                    # wrist\r\n                    if id == 0:\r\n                        cv2.circle(img, (px, py), circleRadius2, red, cv2.FILLED)\r\n                        cv2.putText(img, str(int(id)), (px + 15, py), cv2.FONT_HERSHEY_PLAIN, fontSize1, red,\r\n                                    fontThickness1)\r\n                    # thumb tips\r\n                    elif id == 4:\r\n\r\n                        cv2.circle(img, (px, py), circleRadius2, green, cv2.FILLED)\r\n                        cv2.putText(img, str(int(id)), (px + 15, py), cv2.FONT_HERSHEY_PLAIN, fontSize1, green,\r\n                                    fontThickness1)\r\n                    # other tips\r\n                    elif id in (8, 12, 16, 20):\r\n                        cv2.circle(img, (px, py), circleRadius2, green, cv2.FILLED)\r\n                        cv2.putText(img, str(int(id)), (px + 15, py), cv2.FONT_HERSHEY_PLAIN, fontSize1, green,\r\n                                    fontThickness1)\r\n                    # other parts\r\n                    else:\r\n                        cv2.circle(img, (px, py), circleRadius2, white, cv2.FILLED)\r\n                        cv2.putText(img, str(int(id)), (px + 15, py), cv2.FONT_HERSHEY_PLAIN, fontSize1, white,\r\n                                    fontThickness1)\r\n\r\n                # bbox\r\n                xmin, xmax = min(xList), max(xList)\r\n                ymin, ymax = min(yList), max(yList)\r\n                boxW, boxH = xmax - xmin, ymax - ymin\r\n                bbox = xmin, ymin, boxW, boxH\r\n                cx, cy = bbox[0] + (bbox[2] // 2), bbox[1] + (bbox[3] // 2)\r\n\r\n                myHand[\"lmList\"] = mylmList\r\n                myHand[\"bbox\"] = bbox\r\n                myHand[\"center\"] = (cx, cy)\r\n\r\n                if flipType:\r\n                    if handType.classification[0].label == \"Right\":\r\n                        myHand[\"type\"] = \"Left\"\r\n                    else:\r\n                        myHand[\"type\"] = \"Right\"\r\n                else:\r\n                    myHand[\"type\"] = handType.classification[0].label\r\n                allHands.append(myHand)\r\n\r\n                # draw\r\n                if draw:\r\n                    self.mpDraw.draw_landmarks(img, handLms,\r\n                                               self.mpHands.HAND_CONNECTIONS)\r\n                    cv2.rectangle(img, (bbox[0] - 20, bbox[1] - 20),\r\n                                  (bbox[0] + bbox[2] + 20, bbox[1] + bbox[3] + 20),\r\n                                  purple, lineThickness2)\r\n                    cv2.putText(img, myHand[\"type\"], (bbox[0] - 30, bbox[1] - 30), cv2.FONT_HERSHEY_PLAIN,\r\n                                fontSize2, purple, fontThickness2)\r\n        if draw:\r\n            return allHands, img\r\n        else:\r\n            return allHands\r\n\r\n    def fingersUp(self, myHand):\r\n        \"\"\"\r\n        Finds how many fingers are open and returns in a list.\r\n        Considers left and right hands separately\r\n        :return: List of which fingers are up\r\n        \"\"\"\r\n        myHandType = myHand[\"type\"]\r\n        myLmList = myHand[\"lmList\"]\r\n        if self.results.multi_hand_landmarks:\r\n            fingers = []\r\n            # right thumb\r\n            if myHandType == \"Right\":\r\n                if abs(myLmList[self.tipIds[0]][0] - myLmList[self.tipIds[1] + 1][0]) > 50:\r\n                    if abs(myLmList[self.tipIds[0]][0] - myLmList[self.tipIds[0] + 2][0]) < 30 or abs(\r\n                            myLmList[self.tipIds[0]][0] - myLmList[self.tipIds[1] + 2][0]) < 10:\r\n                        fingers.append(0)\r\n                    else:\r\n                        fingers.append(1)\r\n                else:\r\n                    fingers.append(0)\r\n            # left thumb\r\n            else:\r\n                if abs(myLmList[self.tipIds[0]][0] - myLmList[self.tipIds[1] + 1][0]) > 50:\r\n                    if abs(myLmList[self.tipIds[0]][0] - myLmList[self.tipIds[0] + 2][0]) < 30 or abs(\r\n                            myLmList[self.tipIds[0]][0] - myLmList[self.tipIds[1] + 2][0]) < 30:\r\n                        fingers.append(0)\r\n                    else:\r\n                        fingers.append(1)\r\n                else:\r\n                    fingers.append(0)\r\n\r\n            # 4 fingers\r\n            for id in range(1, 5):\r\n                if myLmList[self.tipIds[id]][1] < myLmList[self.tipIds[id] - 2][1]:\r\n                    fingers.append(1)\r\n                else:\r\n                    fingers.append(0)\r\n        return fingers\r\n\r\n    # noinspection PyMethodMayBeStatic\r\n    def findDistance(self, p1, p2, img=None, draw=True):\r\n        \"\"\"\r\n        Find the distance between two landmarks based on their\r\n        index numbers.\r\n        :param p1: Point1\r\n        :param p2: Point2\r\n        :param img: Image to draw on.\r\n        :param draw: Flag to draw the output on the image.\r\n        :return: Distance between the points\r\n                 Image with output drawn\r\n                 Line information\r\n        \"\"\"\r\n\r\n        x1, y1 = p1\r\n        x2, y2 = p2\r\n        cx, cy = (x1 + x2) // 2, (y1 + y2) // 2\r\n        length = math.hypot(x2 - x1, y2 - y1)\r\n        info = (x1, y1, x2, y2, cx, cy)\r\n        if draw is True:\r\n            cv2.circle(img, (x1, y1), circleRadius1, blue, cv2.FILLED)\r\n            cv2.circle(img, (x2, y2), circleRadius1, blue, cv2.FILLED)\r\n            cv2.line(img, (x1, y1), (x2, y2), blue, 3)\r\n            cv2.circle(img, (cx, cy), circleRadius1, blue, cv2.FILLED)\r\n\r\n            return length, info, img\r\n        else:\r\n            return length, info\r\n\r\n\r\ndef main():\r\n    \"\"\"\r\n    Dummy codes for testing.\r\n    \"\"\"\r\n    cap = cv2.VideoCapture(0)\r\n    detector = HandDetector(detectionCon=0.8, maxHands=2)\r\n    while True:\r\n        # get image frame\r\n        success, img = cap.read()\r\n        img = cv2.flip(img, 1)  # flip for webcam\r\n        # find the hand and its landmarks\r\n        hands, img = detector.findHands(img, flipType=False)  # with draw\r\n        # hands = detector.findHands(img, draw=False)  # without draw\r\n\r\n        if hands:\r\n            # hand 1\r\n            hand1 = hands[0]\r\n            lmList1 = hand1[\"lmList\"]  # list of 21 landmark points\r\n            bbox1 = hand1[\"bbox\"]  # bounding box info x,y,w,h\r\n            centerPoint1 = hand1['center']  # center of the hand cx,cy\r\n            handType1 = hand1[\"type\"]  # hand type left or right\r\n\r\n            fingers1 = detector.fingersUp(hand1)\r\n\r\n            if len(hands) == 2:\r\n                # hand 2\r\n                hand2 = hands[1]\r\n                lmList2 = hand2[\"lmList\"]  # list of 21 landmark points\r\n                bbox2 = hand2[\"bbox\"]  # bounding box info x,y,w,h\r\n                centerPoint2 = hand2['center']  # center of the hand cx,cy\r\n                handType2 = hand2[\"type\"]  # hand Type \"Left\" or \"Right\"\r\n\r\n                fingers2 = detector.fingersUp(hand2)\r\n\r\n                # find Distance between two Landmarks. (could be same hand or different hands)\r\n                length, info, img = detector.findDistance(lmList1[8], lmList2[8], img)  # with draw\r\n                # length, info = detector.findDistance(lmList1[8], lmList2[8])  # with draw\r\n        # display\r\n        cv2.imshow(\"HandTrackingModule\", img)\r\n        cv2.waitKey(1)\r\n\r\n\r\nif __name__ == \"__main__\":\r\n    main()\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/HandTrackingModule.py b/HandTrackingModule.py
+--- a/HandTrackingModule.py	(revision c3a5d154bfcec700b11f22850cf0abfdabea3e3b)
++++ b/HandTrackingModule.py	(date 1669794200837)
+@@ -35,20 +35,21 @@
+     provides bounding box info of the hand found.
+     """
+ 
+-    def __init__(self, mode=False, maxHands=2, detectionCon=0.5, minTrackCon=0.5):
++    def __init__(self, mode=False, maxHands=2, modelComplexity=1, detectionCon=0.5, minTrackCon=0.5):
+         """
+         :param mode: In static mode, detection is done on each image: slower
+         :param maxHands: Maximum number of hands to detect
+         :param detectionCon: Minimum Detection Confidence Threshold
+         :param minTrackCon: Minimum Tracking Confidence Threshold
+         """
++        self.modelComplex = modelComplexity
+         self.mode = mode
+         self.maxHands = maxHands
+         self.detectionCon = detectionCon
+         self.minTrackCon = minTrackCon
+ 
+         self.mpHands = mp.solutions.hands
+-        self.hands = self.mpHands.Hands(self.mode, self.maxHands,
++        self.hands = self.mpHands.Hands(self.mode, self.maxHands, self.modelComplex,
+                                         self.detectionCon, self.minTrackCon)
+         self.mpDraw = mp.solutions.drawing_utils
+         self.tipIds = [4, 8, 12, 16, 20]
+Index: .idea/aws.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/aws.xml b/.idea/aws.xml
+new file mode 100644
+--- /dev/null	(date 1669788564109)
++++ b/.idea/aws.xml	(date 1669788564109)
+@@ -0,0 +1,11 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="accountSettings">
++    <option name="activeRegion" value="us-east-1" />
++    <option name="recentlyUsedRegions">
++      <list>
++        <option value="us-east-1" />
++      </list>
++    </option>
++  </component>
++</project>
+\ No newline at end of file
+Index: requirements.txt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>absl-py==1.3.0\r\nattrs==22.1.0\r\ncontourpy==1.0.6\r\ncvzone==1.5.0\r\ncycler==0.11.0\r\nfonttools==4.38.0\r\nkiwisolver==1.4.4\r\nmatplotlib==3.6.2\r\nmediapipe==0.8.7.1\r\nnumpy==1.21.4\r\nopencv-contrib-python==4.6.0.66\r\nopencv-python==4.6.0.66\r\nopencv-python-headless==4.5.4.58\r\nosascript==2020.12.3\r\npackaging==21.3\r\nPillow==9.3.0\r\nprotobuf==4.21.9\r\npsutil==5.9.4\r\npyparsing==3.0.9\r\npython-dateutil==2.8.2\r\nruncmd==2020.12.3\r\nsix==1.16.0\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/requirements.txt b/requirements.txt
+--- a/requirements.txt	(revision c3a5d154bfcec700b11f22850cf0abfdabea3e3b)
++++ b/requirements.txt	(date 1669794694630)
+@@ -6,17 +6,18 @@
+ fonttools==4.38.0
+ kiwisolver==1.4.4
+ matplotlib==3.6.2
+-mediapipe==0.8.7.1
++mediapipe~=0.8.9.1
+ numpy==1.21.4
+ opencv-contrib-python==4.6.0.66
+-opencv-python==4.6.0.66
++opencv-python~=4.5.4.58
+ opencv-python-headless==4.5.4.58
+ osascript==2020.12.3
+ packaging==21.3
+-Pillow==9.3.0
++Pillow==9.2.0
+ protobuf==4.21.9
+ psutil==5.9.4
+ pyparsing==3.0.9
+ python-dateutil==2.8.2
+ runcmd==2020.12.3
+ six==1.16.0
++pynput~=1.7.6
+Index: .idea/Handy-Youtube-Controller.iml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<module type=\"PYTHON_MODULE\" version=\"4\">\r\n  <component name=\"NewModuleRootManager\">\r\n    <content url=\"file://$MODULE_DIR$\">\r\n      <sourceFolder url=\"file://$MODULE_DIR$\" isTestSource=\"false\" />\r\n      <excludeFolder url=\"file://$MODULE_DIR$/venv\" />\r\n    </content>\r\n    <orderEntry type=\"jdk\" jdkName=\"Python 3.9\" jdkType=\"Python SDK\" />\r\n    <orderEntry type=\"sourceFolder\" forTests=\"false\" />\r\n  </component>\r\n</module>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/Handy-Youtube-Controller.iml b/.idea/Handy-Youtube-Controller.iml
+--- a/.idea/Handy-Youtube-Controller.iml	(revision c3a5d154bfcec700b11f22850cf0abfdabea3e3b)
++++ b/.idea/Handy-Youtube-Controller.iml	(date 1669791935389)
+@@ -5,7 +5,7 @@
+       <sourceFolder url="file://$MODULE_DIR$" isTestSource="false" />
+       <excludeFolder url="file://$MODULE_DIR$/venv" />
+     </content>
+-    <orderEntry type="jdk" jdkName="Python 3.9" jdkType="Python SDK" />
++    <orderEntry type="jdk" jdkName="Python 3.10 (Handy-Youtube-Controller)" jdkType="Python SDK" />
+     <orderEntry type="sourceFolder" forTests="false" />
+   </component>
+ </module>
+\ No newline at end of file
+Index: .idea/misc.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"ProjectRootManager\" version=\"2\" project-jdk-name=\"Python 3.9\" project-jdk-type=\"Python SDK\" />\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/misc.xml b/.idea/misc.xml
+--- a/.idea/misc.xml	(revision c3a5d154bfcec700b11f22850cf0abfdabea3e3b)
++++ b/.idea/misc.xml	(date 1669791935426)
+@@ -1,4 +1,4 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <project version="4">
+-  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.9" project-jdk-type="Python SDK" />
++  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.10 (Handy-Youtube-Controller)" project-jdk-type="Python SDK" />
+ </project>
+\ No newline at end of file
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"ChangeListManager\">\r\n    <list default=\"true\" id=\"80127102-e668-4a11-a90a-8b5e193f01de\" name=\"Changes\" comment=\"set global variables of finger to finger distances for easier modification\">\r\n      <change afterPath=\"$PROJECT_DIR$/.python-version\" afterDir=\"false\" />\r\n      <change afterPath=\"$PROJECT_DIR$/requirements.txt\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/workspace.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/HandTrackingModule.py\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/HandTrackingModule.py\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/README.md\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/README.md\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/keyboardTest.py\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/main.py\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/main.py\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/test.py\" beforeDir=\"false\" />\r\n    </list>\r\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\r\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\r\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\r\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\r\n  </component>\r\n  <component name=\"FileTemplateManagerImpl\">\r\n    <option name=\"RECENT_TEMPLATES\">\r\n      <list>\r\n        <option value=\"Python Script\" />\r\n      </list>\r\n    </option>\r\n  </component>\r\n  <component name=\"Git.Settings\">\r\n    <favorite-branches>\r\n      <branch-storage>\r\n        <map>\r\n          <entry type=\"LOCAL\">\r\n            <value>\r\n              <list>\r\n                <branch-info repo=\"$PROJECT_DIR$\" source=\"dev_ethan\" />\r\n              </list>\r\n            </value>\r\n          </entry>\r\n          <entry type=\"REMOTE\">\r\n            <value>\r\n              <list>\r\n                <branch-info repo=\"$PROJECT_DIR$\" source=\"origin/dev_ethan\" />\r\n              </list>\r\n            </value>\r\n          </entry>\r\n        </map>\r\n      </branch-storage>\r\n    </favorite-branches>\r\n    <option name=\"RECENT_BRANCH_BY_REPOSITORY\">\r\n      <map>\r\n        <entry key=\"$PROJECT_DIR$\" value=\"develop\" />\r\n      </map>\r\n    </option>\r\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\r\n  </component>\r\n  <component name=\"MarkdownSettingsMigration\">\r\n    <option name=\"stateVersion\" value=\"1\" />\r\n  </component>\r\n  <component name=\"ProjectId\" id=\"2I4UaRHMRq0is7nFy1JQcgreAPq\" />\r\n  <component name=\"ProjectLevelVcsManager\">\r\n    <ConfirmationsSetting value=\"2\" id=\"Add\" />\r\n  </component>\r\n  <component name=\"ProjectViewState\">\r\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\r\n    <option name=\"showLibraryContents\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PropertiesComponent\">{\r\n  &quot;keyToString&quot;: {\r\n    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,\r\n    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,\r\n    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,\r\n    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,\r\n    &quot;last_opened_file_path&quot;: &quot;/Users/jsnam/PycharmProjects/Handy-Youtube-Controller&quot;,\r\n    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;\r\n  }\r\n}</component>\r\n  <component name=\"RecentsManager\">\r\n    <key name=\"MoveFile.RECENT_KEYS\">\r\n      <recent name=\"$PROJECT_DIR$\" />\r\n      <recent name=\"$PROJECT_DIR$/SingleHand/VirtualMouse\" />\r\n      <recent name=\"$PROJECT_DIR$/SingleHand\" />\r\n      <recent name=\"$PROJECT_DIR$/MultiHand\" />\r\n      <recent name=\"$PROJECT_DIR$/images\" />\r\n    </key>\r\n  </component>\r\n  <component name=\"RunManager\" selected=\"Python.main\">\r\n    <configuration name=\"MultiHand\" type=\"PythonConfigurationType\" factoryName=\"Python\" temporary=\"true\" nameIsGenerated=\"true\">\r\n      <module name=\"Handy-Youtube-Controller\" />\r\n      <option name=\"INTERPRETER_OPTIONS\" value=\"\" />\r\n      <option name=\"PARENT_ENVS\" value=\"true\" />\r\n      <envs>\r\n        <env name=\"PYTHONUNBUFFERED\" value=\"1\" />\r\n      </envs>\r\n      <option name=\"SDK_HOME\" value=\"\" />\r\n      <option name=\"WORKING_DIRECTORY\" value=\"$PROJECT_DIR$/MultiHand\" />\r\n      <option name=\"IS_MODULE_SDK\" value=\"true\" />\r\n      <option name=\"ADD_CONTENT_ROOTS\" value=\"true\" />\r\n      <option name=\"ADD_SOURCE_ROOTS\" value=\"true\" />\r\n      <option name=\"SCRIPT_NAME\" value=\"$PROJECT_DIR$/MultiHand.py\" />\r\n      <option name=\"PARAMETERS\" value=\"\" />\r\n      <option name=\"SHOW_COMMAND_LINE\" value=\"false\" />\r\n      <option name=\"EMULATE_TERMINAL\" value=\"false\" />\r\n      <option name=\"MODULE_MODE\" value=\"false\" />\r\n      <option name=\"REDIRECT_INPUT\" value=\"false\" />\r\n      <option name=\"INPUT_FILE\" value=\"\" />\r\n      <method v=\"2\" />\r\n    </configuration>\r\n    <configuration name=\"VirtualMouse\" type=\"PythonConfigurationType\" factoryName=\"Python\" temporary=\"true\" nameIsGenerated=\"true\">\r\n      <module name=\"Handy-Youtube-Controller\" />\r\n      <option name=\"INTERPRETER_OPTIONS\" value=\"\" />\r\n      <option name=\"PARENT_ENVS\" value=\"true\" />\r\n      <envs>\r\n        <env name=\"PYTHONUNBUFFERED\" value=\"1\" />\r\n      </envs>\r\n      <option name=\"SDK_HOME\" value=\"\" />\r\n      <option name=\"WORKING_DIRECTORY\" value=\"$PROJECT_DIR$/SingleHand\" />\r\n      <option name=\"IS_MODULE_SDK\" value=\"true\" />\r\n      <option name=\"ADD_CONTENT_ROOTS\" value=\"true\" />\r\n      <option name=\"ADD_SOURCE_ROOTS\" value=\"true\" />\r\n      <option name=\"SCRIPT_NAME\" value=\"$PROJECT_DIR$/SingleHand/VirtualMouse/VirtualMouse.py\" />\r\n      <option name=\"PARAMETERS\" value=\"\" />\r\n      <option name=\"SHOW_COMMAND_LINE\" value=\"false\" />\r\n      <option name=\"EMULATE_TERMINAL\" value=\"false\" />\r\n      <option name=\"MODULE_MODE\" value=\"false\" />\r\n      <option name=\"REDIRECT_INPUT\" value=\"false\" />\r\n      <option name=\"INPUT_FILE\" value=\"\" />\r\n      <method v=\"2\" />\r\n    </configuration>\r\n    <configuration name=\"keyboardTest\" type=\"PythonConfigurationType\" factoryName=\"Python\" temporary=\"true\" nameIsGenerated=\"true\">\r\n      <module name=\"Handy-Youtube-Controller\" />\r\n      <option name=\"INTERPRETER_OPTIONS\" value=\"\" />\r\n      <option name=\"PARENT_ENVS\" value=\"true\" />\r\n      <envs>\r\n        <env name=\"PYTHONUNBUFFERED\" value=\"1\" />\r\n      </envs>\r\n      <option name=\"SDK_HOME\" value=\"\" />\r\n      <option name=\"WORKING_DIRECTORY\" value=\"$PROJECT_DIR$\" />\r\n      <option name=\"IS_MODULE_SDK\" value=\"true\" />\r\n      <option name=\"ADD_CONTENT_ROOTS\" value=\"true\" />\r\n      <option name=\"ADD_SOURCE_ROOTS\" value=\"true\" />\r\n      <option name=\"SCRIPT_NAME\" value=\"$PROJECT_DIR$/keyboardTest.py\" />\r\n      <option name=\"PARAMETERS\" value=\"\" />\r\n      <option name=\"SHOW_COMMAND_LINE\" value=\"false\" />\r\n      <option name=\"EMULATE_TERMINAL\" value=\"false\" />\r\n      <option name=\"MODULE_MODE\" value=\"false\" />\r\n      <option name=\"REDIRECT_INPUT\" value=\"false\" />\r\n      <option name=\"INPUT_FILE\" value=\"\" />\r\n      <method v=\"2\" />\r\n    </configuration>\r\n    <configuration name=\"main\" type=\"PythonConfigurationType\" factoryName=\"Python\" temporary=\"true\" nameIsGenerated=\"true\">\r\n      <module name=\"Handy-Youtube-Controller\" />\r\n      <option name=\"INTERPRETER_OPTIONS\" value=\"\" />\r\n      <option name=\"PARENT_ENVS\" value=\"true\" />\r\n      <envs>\r\n        <env name=\"PYTHONUNBUFFERED\" value=\"1\" />\r\n      </envs>\r\n      <option name=\"SDK_HOME\" value=\"\" />\r\n      <option name=\"WORKING_DIRECTORY\" value=\"$PROJECT_DIR$\" />\r\n      <option name=\"IS_MODULE_SDK\" value=\"true\" />\r\n      <option name=\"ADD_CONTENT_ROOTS\" value=\"true\" />\r\n      <option name=\"ADD_SOURCE_ROOTS\" value=\"true\" />\r\n      <option name=\"SCRIPT_NAME\" value=\"$PROJECT_DIR$/main.py\" />\r\n      <option name=\"PARAMETERS\" value=\"\" />\r\n      <option name=\"SHOW_COMMAND_LINE\" value=\"false\" />\r\n      <option name=\"EMULATE_TERMINAL\" value=\"false\" />\r\n      <option name=\"MODULE_MODE\" value=\"false\" />\r\n      <option name=\"REDIRECT_INPUT\" value=\"false\" />\r\n      <option name=\"INPUT_FILE\" value=\"\" />\r\n      <method v=\"2\" />\r\n    </configuration>\r\n    <configuration name=\"test\" type=\"PythonConfigurationType\" factoryName=\"Python\" temporary=\"true\" nameIsGenerated=\"true\">\r\n      <module name=\"Handy-Youtube-Controller\" />\r\n      <option name=\"INTERPRETER_OPTIONS\" value=\"\" />\r\n      <option name=\"PARENT_ENVS\" value=\"true\" />\r\n      <envs>\r\n        <env name=\"PYTHONUNBUFFERED\" value=\"1\" />\r\n      </envs>\r\n      <option name=\"SDK_HOME\" value=\"\" />\r\n      <option name=\"WORKING_DIRECTORY\" value=\"$PROJECT_DIR$\" />\r\n      <option name=\"IS_MODULE_SDK\" value=\"true\" />\r\n      <option name=\"ADD_CONTENT_ROOTS\" value=\"true\" />\r\n      <option name=\"ADD_SOURCE_ROOTS\" value=\"true\" />\r\n      <option name=\"SCRIPT_NAME\" value=\"$PROJECT_DIR$/test.py\" />\r\n      <option name=\"PARAMETERS\" value=\"\" />\r\n      <option name=\"SHOW_COMMAND_LINE\" value=\"false\" />\r\n      <option name=\"EMULATE_TERMINAL\" value=\"false\" />\r\n      <option name=\"MODULE_MODE\" value=\"false\" />\r\n      <option name=\"REDIRECT_INPUT\" value=\"false\" />\r\n      <option name=\"INPUT_FILE\" value=\"\" />\r\n      <method v=\"2\" />\r\n    </configuration>\r\n    <recent_temporary>\r\n      <list>\r\n        <item itemvalue=\"Python.main\" />\r\n        <item itemvalue=\"Python.test\" />\r\n        <item itemvalue=\"Python.keyboardTest\" />\r\n        <item itemvalue=\"Python.VirtualMouse\" />\r\n        <item itemvalue=\"Python.MultiHand\" />\r\n      </list>\r\n    </recent_temporary>\r\n  </component>\r\n  <component name=\"SpellCheckerSettings\" RuntimeDictionaries=\"0\" Folders=\"0\" CustomDictionaries=\"0\" DefaultDictionary=\"application-level\" UseSingleDictionary=\"true\" transferred=\"true\" />\r\n  <component name=\"TaskManager\">\r\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\r\n      <changelist id=\"80127102-e668-4a11-a90a-8b5e193f01de\" name=\"Changes\" comment=\"\" />\r\n      <created>1669440411760</created>\r\n      <option name=\"number\" value=\"Default\" />\r\n      <option name=\"presentableId\" value=\"Default\" />\r\n      <updated>1669440411760</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00001\" summary=\"imported cvzone packages and add some visual changes to it on new branch\">\r\n      <created>1669553305107</created>\r\n      <option name=\"number\" value=\"00001\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00001\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1669553305107</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00002\" summary=\"implemented a fps feature\">\r\n      <created>1669553594426</created>\r\n      <option name=\"number\" value=\"00002\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00002\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1669553594426</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00003\" summary=\"added bounding box feature and tested for external camera (smartphone)\">\r\n      <created>1669596994729</created>\r\n      <option name=\"number\" value=\"00003\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00003\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1669596994729</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00004\" summary=\"added 2 handed feature for further function implementation\">\r\n      <created>1669606489391</created>\r\n      <option name=\"number\" value=\"00004\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00004\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1669606489391</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00005\" summary=\"copied and edited an external library code into workspace for easier modification.\">\r\n      <created>1669606935989</created>\r\n      <option name=\"number\" value=\"00005\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00005\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1669606935989</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00006\" summary=\"added camInput variable for easier input selection.\">\r\n      <created>1669607901068</created>\r\n      <option name=\"number\" value=\"00006\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00006\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1669607901068</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00007\" summary=\"implemented a volume control feature in MacOSX, and it's super cool\">\r\n      <created>1669644140222</created>\r\n      <option name=\"number\" value=\"00007\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00007\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1669644140222</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00008\" summary=\"implemented a media control feature and fixed minor volume control error\">\r\n      <created>1669647720229</created>\r\n      <option name=\"number\" value=\"00008\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00008\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1669647720229</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00009\" summary=\"major change in gesture and implemented a page control feature (scroll down and up)\">\r\n      <created>1669689359156</created>\r\n      <option name=\"number\" value=\"00009\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00009\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1669689359156</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00010\" summary=\"workarounds for desktop control mode and major change in gestures to implement inactive state of features\">\r\n      <created>1669735337422</created>\r\n      <option name=\"number\" value=\"00010\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00010\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1669735337422</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00011\" summary=\"set global variables of finger to finger distances for easier modification\">\r\n      <created>1669737829805</created>\r\n      <option name=\"number\" value=\"00011\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00011\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1669737829805</updated>\r\n    </task>\r\n    <option name=\"localTasksCounter\" value=\"12\" />\r\n    <servers />\r\n  </component>\r\n  <component name=\"Vcs.Log.Tabs.Properties\">\r\n    <option name=\"TAB_STATES\">\r\n      <map>\r\n        <entry key=\"MAIN\">\r\n          <value>\r\n            <State>\r\n              <option name=\"FILTERS\">\r\n                <map>\r\n                  <entry key=\"branch\">\r\n                    <value>\r\n                      <list>\r\n                        <option value=\"dev_ethan\" />\r\n                      </list>\r\n                    </value>\r\n                  </entry>\r\n                </map>\r\n              </option>\r\n            </State>\r\n          </value>\r\n        </entry>\r\n      </map>\r\n    </option>\r\n    <option name=\"RECENT_FILTERS\">\r\n      <map>\r\n        <entry key=\"Branch\">\r\n          <value>\r\n            <list>\r\n              <RecentGroup>\r\n                <option name=\"FILTER_VALUES\">\r\n                  <option value=\"dev_ethan\" />\r\n                </option>\r\n              </RecentGroup>\r\n              <RecentGroup>\r\n                <option name=\"FILTER_VALUES\">\r\n                  <option value=\"HEAD\" />\r\n                </option>\r\n              </RecentGroup>\r\n            </list>\r\n          </value>\r\n        </entry>\r\n      </map>\r\n    </option>\r\n  </component>\r\n  <component name=\"VcsManagerConfiguration\">\r\n    <option name=\"ADD_EXTERNAL_FILES_SILENTLY\" value=\"true\" />\r\n    <MESSAGE value=\"imported cvzone packages and add some visual changes to it on new branch\" />\r\n    <MESSAGE value=\"implemented a fps feature\" />\r\n    <MESSAGE value=\"added bounding box feature and tested for external camera (smartphone)\" />\r\n    <MESSAGE value=\"added 2 handed feature for further function implementation\" />\r\n    <MESSAGE value=\"copied and edited an external library code into workspace for easier modification.\" />\r\n    <MESSAGE value=\"added camInput variable for easier input selection.\" />\r\n    <MESSAGE value=\"implemented a volume control feature in MacOSX, and it's super cool\" />\r\n    <MESSAGE value=\"implemented a media control feature and fixed minor volume control error\" />\r\n    <MESSAGE value=\"major change in gesture and implemented a page control feature (scroll down and up)\" />\r\n    <MESSAGE value=\"workarounds for desktop control mode and major change in gestures to implement inactive state of features\" />\r\n    <MESSAGE value=\"set global variables of finger to finger distances for easier modification\" />\r\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"set global variables of finger to finger distances for easier modification\" />\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	(revision c3a5d154bfcec700b11f22850cf0abfdabea3e3b)
++++ b/.idea/workspace.xml	(date 1669795441559)
+@@ -2,15 +2,14 @@
+ <project version="4">
+   <component name="ChangeListManager">
+     <list default="true" id="80127102-e668-4a11-a90a-8b5e193f01de" name="Changes" comment="set global variables of finger to finger distances for easier modification">
+-      <change afterPath="$PROJECT_DIR$/.python-version" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/.idea/aws.xml" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/.idea/Handy-Youtube-Controller.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Handy-Youtube-Controller.iml" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_2022_11_26_2_32_PM__Changes_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_2022_11_26_2_32_PM__Changes_.xml" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_2022_11_26_2_32_PM__Changes_1.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_2022_11_26_2_32_PM__Changes_1.xml" afterDir="false" />
+       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+       <change beforePath="$PROJECT_DIR$/HandTrackingModule.py" beforeDir="false" afterPath="$PROJECT_DIR$/HandTrackingModule.py" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/keyboardTest.py" beforeDir="false" />
+-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/test.py" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+     </list>
+     <option name="SHOW_DIALOG" value="false" />
+     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+@@ -47,7 +46,7 @@
+     </favorite-branches>
+     <option name="RECENT_BRANCH_BY_REPOSITORY">
+       <map>
+-        <entry key="$PROJECT_DIR$" value="develop" />
++        <entry key="$PROJECT_DIR$" value="dev_ethan" />
+       </map>
+     </option>
+     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+@@ -60,19 +59,22 @@
+     <ConfirmationsSetting value="2" id="Add" />
+   </component>
+   <component name="ProjectViewState">
++    <option name="autoscrollToSource" value="true" />
+     <option name="hideEmptyMiddlePackages" value="true" />
+     <option name="showLibraryContents" value="true" />
+   </component>
+-  <component name="PropertiesComponent">{
+-  &quot;keyToString&quot;: {
+-    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+-    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+-    &quot;last_opened_file_path&quot;: &quot;/Users/jsnam/PycharmProjects/Handy-Youtube-Controller&quot;,
+-    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
++  <component name="PropertiesComponent"><![CDATA[{
++  "keyToString": {
++    "ASKED_ADD_EXTERNAL_FILES": "true",
++    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
++    "RunOnceActivity.OpenProjectViewOnStart": "true",
++    "RunOnceActivity.ShowReadmeOnStart": "true",
++    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
++    "dart.analysis.tool.window.visible": "false",
++    "last_opened_file_path": "C:/Users/Ethan/PycharmProjects/Handy-Youtube-Controller",
++    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
+   }
+-}</component>
++}]]></component>
+   <component name="RecentsManager">
+     <key name="MoveFile.RECENT_KEYS">
+       <recent name="$PROJECT_DIR$" />
+@@ -292,19 +294,7 @@
+       <map>
+         <entry key="MAIN">
+           <value>
+-            <State>
+-              <option name="FILTERS">
+-                <map>
+-                  <entry key="branch">
+-                    <value>
+-                      <list>
+-                        <option value="dev_ethan" />
+-                      </list>
+-                    </value>
+-                  </entry>
+-                </map>
+-              </option>
+-            </State>
++            <State />
+           </value>
+         </entry>
+       </map>
+@@ -314,6 +304,11 @@
+         <entry key="Branch">
+           <value>
+             <list>
++              <RecentGroup>
++                <option name="FILTER_VALUES">
++                  <option value="origin/dev_ethan" />
++                </option>
++              </RecentGroup>
+               <RecentGroup>
+                 <option name="FILTER_VALUES">
+                   <option value="dev_ethan" />

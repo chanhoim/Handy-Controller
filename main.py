@@ -180,15 +180,15 @@ while True:
 
                     # print(mvuLength, mvuInfo[4], mvuInfo[5])
                     if mvuLength < tiDist1:
-                        cv2.circle(img, (mvuInfo[4], mvuInfo[5]), circleRadius3, blue, cv2.FILLED)
                         print("volume up")
+                        cv2.circle(img, (mvuInfo[4], mvuInfo[5]), circleRadius3, blue, cv2.FILLED)
                         keyboard.press(Key.media_volume_up)
                         time.sleep(mvcTime)
                         keyboard.release(Key.media_volume_up)
 
                     if mvdLength < tiDist1:
-                        cv2.circle(img, (mvdInfo[4], mvdInfo[5]), circleRadius3, blue, cv2.FILLED)
                         print("volume down")
+                        cv2.circle(img, (mvdInfo[4], mvdInfo[5]), circleRadius3, blue, cv2.FILLED)
                         keyboard.press(Key.media_volume_down)
                         time.sleep(mvcTime)
                         keyboard.release(Key.media_volume_down)
@@ -282,15 +282,15 @@ while True:
                         mvmLength, mvmInfo, img = detector.findDistance(lmList2[8], lmList2[4], img)
 
                         if mvdLength < tmDist2:
-                            cv2.circle(img, (mvdInfo[4], mvdInfo[5]), circleRadius3, blue, cv2.FILLED)
                             print("volume down")
+                            cv2.circle(img, (mvdInfo[4], mvdInfo[5]), circleRadius3, blue, cv2.FILLED)
                             keyboard.press(Key.media_volume_down)
                             time.sleep(mvcTime)
                             keyboard.release(Key.media_volume_down)
 
                         if mvuLength < tmDist2:
-                            cv2.circle(img, (mvuInfo[4], mvuInfo[5]), circleRadius3, blue, cv2.FILLED)
                             print("volume up")
+                            cv2.circle(img, (mvuInfo[4], mvuInfo[5]), circleRadius3, blue, cv2.FILLED)
                             keyboard.press(Key.media_volume_up)
                             time.sleep(mvcTime)
                             keyboard.release(Key.media_volume_up)
@@ -316,15 +316,15 @@ while True:
                         mppLength, mppInfo, img = detector.findDistance(lmList2[8], lmList2[4], img)
 
                         if mpLength < tmDist2:
-                            cv2.circle(img, (mpInfo[4], mpInfo[5]), circleRadius3, blue, cv2.FILLED)
                             print("play previous")
+                            cv2.circle(img, (mpInfo[4], mpInfo[5]), circleRadius3, blue, cv2.FILLED)
                             keyboard.press(Key.media_previous)
                             time.sleep(mdcTime)
                             keyboard.release(Key.media_previous)
 
                         if mnLength < tmDist2:
-                            cv2.circle(img, (mnInfo[4], mnInfo[5]), circleRadius3, blue, cv2.FILLED)
                             print("play next")
+                            cv2.circle(img, (mnInfo[4], mnInfo[5]), circleRadius3, blue, cv2.FILLED)
                             keyboard.press(Key.media_next)
                             time.sleep(mdcTime)
                             keyboard.release(Key.media_next)
@@ -350,16 +350,21 @@ while True:
                         phLength, phInfo, img = detector.findDistance(lmList2[8], lmList2[4], img)
                         peLength, peInfo, img = detector.findDistance(lmList2[8], lmList2[3], img)
 
-                        # TODO: fix page control feature (scroll too slow) for Windows
                         if pdLength < tmDist2:
-                            cv2.circle(img, (pdInfo[4], pdInfo[5]), circleRadius3, blue, cv2.FILLED)
                             print("page down")
-                            pyautogui.scroll(-10)
+                            cv2.circle(img, (pdInfo[4], pdInfo[5]), circleRadius3, blue, cv2.FILLED)
+                            if myOS == "Windows":
+                                pyautogui.scroll(-250)
+                            if myOS == "Darwin":
+                                pyautogui.scroll(-10)
 
                         if puLength < tmDist2:
-                            cv2.circle(img, (puInfo[4], puInfo[5]), circleRadius3, blue, cv2.FILLED)
                             print("page up")
-                            pyautogui.scroll(10)
+                            cv2.circle(img, (puInfo[4], puInfo[5]), circleRadius3, blue, cv2.FILLED)
+                            if myOS == "Windows":
+                                pyautogui.scroll(250)
+                            if myOS == "Darwin":
+                                pyautogui.scroll(10)
 
                         if phLength < tiDist2:
                             print("home")
@@ -436,28 +441,35 @@ while True:
                         mcLength, mcInfo, img = detector.findDistance(lmList2[8], lmList2[4], img)
                         sdLength, sdInfo, img = detector.findDistance(lmList2[8], lmList2[3], img)
 
-                        # TODO: implement desktop feature for Windows
                         if pdLength < tmDist2:
                             print("previous desktop")
                             cv2.circle(img, (pdInfo[4], pdInfo[5]), circleRadius3, blue, cv2.FILLED)
+                            if myOS == "Windows":
+                                pyautogui.hotkey('win', 'ctrl', 'left')
                             if myOS == "Darwin":
                                 pyautogui.hotkey('ctrl', 'left')
 
                         if ndLength < tmDist2:
                             print("next desktop")
                             cv2.circle(img, (ndInfo[4], ndInfo[5]), circleRadius3, blue, cv2.FILLED)
+                            if myOS == "Windows":
+                                pyautogui.hotkey('win', 'ctrl', 'right')
                             if myOS == "Darwin":
                                 pyautogui.hotkey('ctrl', 'right')
 
                         if mcLength < tiDist2:
                             print("show applications")
                             cv2.circle(img, (mcInfo[4], mcInfo[5]), circleRadius3, blue, cv2.FILLED)
+                            if myOS == "Windows":
+                                pyautogui.hotkey('win', 'tab')
                             if myOS == "Darwin":
                                 pyautogui.hotkey('ctrl', 'up')
 
                         if sdLength < tiDist2:
                             print("show desktop")
                             cv2.circle(img, (sdInfo[4], sdInfo[5]), circleRadius3, blue, cv2.FILLED)
+                            if myOS == "Windows":
+                                pyautogui.hotkey('win', 'd')
                             if myOS == "Darwin":
                                 pyautogui.hotkey('fn', 'f10')
                     else:
