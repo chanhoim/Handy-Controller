@@ -50,7 +50,7 @@ pTime = 0  # page control time
 mocTime = 0.25  # mouse control time
 mvcTime = 0.1  # media volume control time
 mdcTime = 0.4  # media control time
-pgcTime = 0.3  # page control time
+pgcTime = 0.2  # page control time
 dkcTime = 0.1  # desktop control time
 
 # finger to finger distances
@@ -66,7 +66,7 @@ camInput = 0  # 0 for webcam, 1 for external source
 cap = cv2.VideoCapture(camInput)
 
 # mouse location variables
-smoothening = 3
+smoothening = 3.5
 plocX, plocY = 0, 0
 clocX, clocY = 0, 0
 camW, camH = 640, 480  # camera size
@@ -101,7 +101,7 @@ while True:
             x1, y1 = lmList1[8][0], lmList1[8][1]  # index finger location
             # print(x1, y1)
 
-            # print(f"{handType1} Hand, Center = {centerPoint1}, Fingers = {fingers1}")
+            print(f"{handType1} Hand, Center = {centerPoint1}, Fingers = {fingers1}")
 
             cv2.rectangle(img=img, pt1=(frmW, frmH), pt2=(camW - frmW, camH - frmH), color=purple,
                           thickness=lineThickness2)
@@ -156,6 +156,7 @@ while True:
                         cv2.circle(img, (mcInfo[4], mcInfo[5]), circleRadius2, purple, cv2.FILLED)
                         pyautogui.hotkey('command', 'up', interval=mocTime)  # mimics go back
 
+                # TODO: change to more comfortable gesture
                 # mouse right click mode
                 if fingers1[0] == 1 and fingers1[4] == 1:
                     print("Mouse Right Click Mode (Active)")
@@ -242,7 +243,7 @@ while True:
             handType1 = hand1["type"]  # hand type (left or right)
             fingers1 = detector.fingersUp(hand1)
 
-            # print(f"{handType1} Hand, Center = {centerPoint1}, Fingers = {fingers1}")
+            print(f"{handType1} Hand, Center = {centerPoint1}, Fingers = {fingers1}")
 
             # 2nd hand info
             hand2 = hands[1]
@@ -252,7 +253,7 @@ while True:
             handType2 = hand2["type"]  # hand type (left or right)
             fingers2 = detector.fingersUp(hand2)
 
-            # print(f"{handType2} Hand, Center = {centerPoint2}, Fingers = {fingers2}")
+            print(f"{handType2} Hand, Center = {centerPoint2}, Fingers = {fingers2}")
 
             # TODO: implement quit feature
             # hhLength, hhInfo = detector.findDistance(centerPoint1, centerPoint2, img, draw=False)
@@ -394,7 +395,7 @@ while True:
                         bMaxLength, bMaxInfo, img = detector.findDistance(lmList2[8], lmList2[4], img)
                         bMinLength, bMinInfo, img = detector.findDistance(lmList2[8], lmList2[3], img)
 
-                        # TODO: fix and implement brightness feature for Windows and MacOSX, respectively
+                        # TODO: fix brightness down feature for Windows and MacOSX
                         if bdLength < tmDist2:
                             print("brightness down")
                             cv2.circle(img, (bdInfo[4], bdInfo[5]), circleRadius3, blue, cv2.FILLED)
@@ -403,6 +404,7 @@ while True:
                             if myOS == "Darwin":
                                 pyautogui.hotkey('fn', 'f11')
 
+                        # TODO: fix brightness up feature for Windows and MacOSX
                         if buLength < tmDist2:
                             print("brightness up")
                             cv2.circle(img, (buInfo[4], buInfo[5]), circleRadius3, blue, cv2.FILLED)
@@ -411,6 +413,7 @@ while True:
                             if myOS == "Darwin":
                                 pyautogui.hotkey('fn', 'f12')
 
+                        # TODO: implement max brightness feature for MacOSX
                         if bMaxLength < tiDist2:
                             print("brightness 100%")
                             cv2.circle(img, (bMaxInfo[4], bMaxInfo[5]), circleRadius3, blue, cv2.FILLED)
@@ -419,6 +422,7 @@ while True:
                             if myOS == "Darwin":
                                 print("not implemented in MacOSX yet")
 
+                        # TODO: implement min brightness feature for MacOSX
                         if bMinLength < tiDist2:
                             print("brightness 0%")
                             cv2.circle(img, (bMinInfo[4], bMinInfo[5]), circleRadius3, blue, cv2.FILLED)
