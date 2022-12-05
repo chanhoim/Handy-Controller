@@ -164,7 +164,7 @@ while True:
                         print("go forward")
                         cv2.circle(img, (gfInfo[4], gfInfo[5]), circleRadius2, purple, cv2.FILLED)
                         if myOS == "Windows":
-                            pyautogui.hotkey('ctrl', ']')
+                            pyautogui.hotkey('alt', 'right')
                         if myOS == "Darwin":
                             pyautogui.hotkey('command', ']')
 
@@ -172,7 +172,7 @@ while True:
                         print("gp backward")
                         cv2.circle(img, (gbInfo[4], gbInfo[5]), circleRadius2, purple, cv2.FILLED)
                         if myOS == "Windows":
-                            pyautogui.hotkey('ctrl', '[')
+                            pyautogui.hotkey('alt', 'left')
                         if myOS == "Darwin":
                             pyautogui.hotkey('command', '[')
                 else:
@@ -290,6 +290,13 @@ while True:
                     else:
                         print("Desktop Control Mode (Inactive)")
 
+            if fingers1 == [0, 0, 1, 0, 0]:
+                '''
+                1-5. Quit Mode.
+                '''
+                print("quit")
+                exit()
+
         if len(hands) == 2:
             """
             2. Two Hands Detected
@@ -313,14 +320,6 @@ while True:
             fingers2 = detector.fingersUp(hand2)
 
             print(f"{handType2} Hand, Center = {centerPoint2}, Fingers = {fingers2}")
-
-            # TODO: implement quit feature
-            # hhLength, hhInfo = detector.findDistance(centerPoint1, centerPoint2, img, draw=False)
-            #
-            # print(hhLength)
-            # if hhLength < 200:
-            #     print("exit")
-            #     exit()
 
             # handType1 is left hand and handType2 is right hand
             if handType1 == "Left" and handType2 == "Right":
@@ -454,7 +453,7 @@ while True:
                         bMaxLength, bMaxInfo, img = detector.findDistance(lmList2[8], lmList2[4], img)
                         bMinLength, bMinInfo, img = detector.findDistance(lmList2[8], lmList2[3], img)
 
-                        # TODO: fix brightness up & down feature for Windows and MacOSX
+                        # TODO: fix brightness up & down feature for MacOSX
                         if bdLength < tmDist2:
                             print("brightness down")
                             cv2.circle(img, (bdInfo[4], bdInfo[5]), circleRadius2, purple, cv2.FILLED)
