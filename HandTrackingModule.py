@@ -12,11 +12,11 @@ import numpy as np
 circleRadius1 = 5
 circleRadius2 = 10
 
-fontSize1 = 1.5
+fontSize1 = 1
 fontThickness1 = 2  # integer only
 
-fontSize2 = 2.5
-fontThickness2 = 3  # integer only
+fontSize2 = 1.5
+fontThickness2 = 2  # integer only
 
 lineThickness2 = 4
 
@@ -150,7 +150,7 @@ class HandDetector:
         if self.results.multi_hand_landmarks:
             fingers = []
 
-            # TODO: fix thumb not recognizing problem
+            # TODO: fix thumb not recognizing problem (ti - mrp)
             # right thumb
             if myHandType == "Right":
                 if abs(myLmList[self.tipIds[0]][0] - myLmList[self.tipIds[1] + 1][0]) > 50:
