@@ -184,11 +184,13 @@ while True:
                     puLength, puInfo, img = detector.findDistance(lmList1[4], lmList1[14], img)
                     pdLength, pdInfo, img = detector.findDistance(lmList1[4], lmList1[15], img)
 
-                    # TODO: change to new mouse feature
                     if mdLength < 40:
-                        print("mouse drag")
+                        print("double click")
                         cv2.circle(img, (mdInfo[4], mdInfo[5]), circleRadius2, purple, cv2.FILLED)
-                        pyautogui.dragTo(clocX, clocY, button='left')
+                        if myOS == "Windows":
+                            pyautogui.hotkey('ctrl', 'enter')
+                        if myOS == "Darwin":
+                            pyautogui.hotkey('command', 'down')
 
                     if puLength < mrDist1:
                         print("page up")
