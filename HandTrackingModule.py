@@ -7,15 +7,16 @@ Website: https://www.computervision.zone/
 import cv2
 import mediapipe as mp
 import math
+import numpy as np
 
 circleRadius1 = 5
 circleRadius2 = 10
 
-fontSize1 = 1.5
+fontSize1 = 1
 fontThickness1 = 2  # integer only
 
-fontSize2 = 2.5
-fontThickness2 = 3  # integer only
+fontSize2 = 1.5
+fontThickness2 = 2  # integer only
 
 lineThickness2 = 4
 
@@ -42,14 +43,15 @@ class HandDetector:
         :param detectionCon: Minimum Detection Confidence Threshold
         :param minTrackCon: Minimum Tracking Confidence Threshold
         """
-        self.modelComplex = modelComplexity
+
         self.mode = mode
         self.maxHands = maxHands
+        self.modelComplexity = modelComplexity
         self.detectionCon = detectionCon
         self.minTrackCon = minTrackCon
 
         self.mpHands = mp.solutions.hands
-        self.hands = self.mpHands.Hands(self.mode, self.maxHands, self.modelComplex,
+        self.hands = self.mpHands.Hands(self.mode, self.maxHands, self.modelComplexity,
                                         self.detectionCon, self.minTrackCon)
         self.mpDraw = mp.solutions.drawing_utils
         self.tipIds = [4, 8, 12, 16, 20]
@@ -147,11 +149,13 @@ class HandDetector:
         myLmList = myHand["lmList"]
         if self.results.multi_hand_landmarks:
             fingers = []
+
+            # TODO: fix thumb not recognizing problem (ti - mrp)
             # right thumb
             if myHandType == "Right":
                 if abs(myLmList[self.tipIds[0]][0] - myLmList[self.tipIds[1] + 1][0]) > 50:
                     if abs(myLmList[self.tipIds[0]][0] - myLmList[self.tipIds[0] + 2][0]) < 30 or abs(
-                            myLmList[self.tipIds[0]][0] - myLmList[self.tipIds[1] + 2][0]) < 10:
+                            myLmList[self.tipIds[0]][0] - myLmList[self.tipIds[1] + 2][0]) < 30:
                         fingers.append(0)
                     else:
                         fingers.append(1)
@@ -170,10 +174,17 @@ class HandDetector:
 
             # 4 fingers
             for id in range(1, 5):
-                if myLmList[self.tipIds[id]][1] < myLmList[self.tipIds[id] - 2][1]:
-                    fingers.append(1)
+                if myLmList[0][1] > myLmList[self.tipIds[2]][1]:
+                    if myLmList[self.tipIds[id]][1] < myLmList[self.tipIds[id] - 2][1]:
+                        fingers.append(1)
+                    else:
+                        fingers.append(0)
                 else:
-                    fingers.append(0)
+                    if myLmList[self.tipIds[id]][1] < myLmList[self.tipIds[id] - 2][1]:
+                        fingers.append(0)
+                    else:
+                        fingers.append(1)
+
         return fingers
 
     # noinspection PyMethodMayBeStatic
@@ -227,8 +238,9 @@ def main():
             bbox1 = hand1["bbox"]  # bounding box info x,y,w,h
             centerPoint1 = hand1['center']  # center of the hand cx,cy
             handType1 = hand1["type"]  # hand type left or right
-
             fingers1 = detector.fingersUp(hand1)
+
+            print(f"{handType1} Hand, Center = {centerPoint1}, Fingers = {fingers1}")
 
             if len(hands) == 2:
                 # hand 2
@@ -237,12 +249,16 @@ def main():
                 bbox2 = hand2["bbox"]  # bounding box info x,y,w,h
                 centerPoint2 = hand2['center']  # center of the hand cx,cy
                 handType2 = hand2["type"]  # hand Type "Left" or "Right"
-
                 fingers2 = detector.fingersUp(hand2)
+
+                print(f"{handType2} Hand, Center = {centerPoint2}, Fingers = {fingers2}")
 
                 # find Distance between two Landmarks. (could be same hand or different hands)
                 length, info, img = detector.findDistance(lmList1[8], lmList2[8], img)  # with draw
                 # length, info = detector.findDistance(lmList1[8], lmList2[8])  # with draw
+
+                print("")
+
         # display
         cv2.imshow("HandTrackingModule", img)
         cv2.waitKey(1)
