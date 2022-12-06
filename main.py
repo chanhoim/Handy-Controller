@@ -81,6 +81,9 @@ cap.set(4, camH)
 # new detector object from HandDetector class
 detector = HandDetector(detectionCon=0.9, maxHands=2)
 
+# control mode
+controlMode=None
+
 while True:
     success, img = cap.read()
     if camInput == 0:
@@ -105,22 +108,52 @@ while True:
             x1, y1 = lmList1[8][0], lmList1[8][1]  # index finger location
 
             # print(x1, y1)
-            print(f"{handType1} Hand, Center = {centerPoint1}, Fingers = {fingers1}")
+            #print(f"{handType1} Hand, Center = {centerPoint1}, Fingers = {fingers1}")
             # print("bounding box area = ", bbox1Area)
 
             cv2.rectangle(img=img, pt1=(frmW, frmH), pt2=(camW - frmW, camH - frmH), color=purple,
                           thickness=lineThickness2)
+            
+            if handType1 == "Left":
+                if fingers1[0:5] == [0, 0, 0, 0, 0]:
+                    print("idle state Mode")
+                    controlMode=0
+                elif fingers1[0:5] == [0, 1, 0, 0, 0]:
+                    print("volume control mode")
+                    controlMode=1
+                elif fingers1[0:5] == [0, 1, 1, 0, 0]:
+                    print("mouse control mode")
+                    controlMode=2
+                elif fingers1[0:5] == [0, 1, 1, 1, 0]:
+                    print("media control mode")
+                    controlMode=3
+                elif fingers1[0:5] == [0, 1, 1, 1, 1]:
+                    print("volume control mode")
+                    controlMode=4
+                elif fingers1[0:5] == [1, 1, 1, 1, 1]:
+                    print("desktop control mode")
+                    controlMode=5
+                   elif fingers1[0:5] == [0, 0, 1, 0, 0]:
+                    print("quit")
+                    exit()
+            
 
+                    
+            elif handType1=="Right":
+                print("Control Mode Status="+str(controlMode))
+
+
+            '''
             if fingers1[1:5] == [0, 0, 0, 0]:
-                '''
-                1-0. Idle State Mode.
-                '''
+                
+                #1-0. Idle State Mode.
+                
                 print("Idle State Mode")
 
             if fingers1[1:5] == [1, 1, 0, 0]:
-                '''
-                1-1. Mouse Control Mode.
-                '''
+                
+                #1-1. Mouse Control Mode.
+                
                 modeLength, modeInfo, img = detector.findDistance(lmList1[12], lmList1[8], img)
 
                 x3 = np.interp(x1, (frmW, camW - frmW), (0, scrW))
@@ -140,9 +173,9 @@ while True:
                     plocX, plocY = clocX, clocY
 
                 if modeLength > miDist1:
-                    '''
-                    1-1-1. Mouse Mode 1.
-                    '''
+                    
+                    #1-1-1. Mouse Mode 1.
+                    
                     print("Mouse Mode 1 (Active)")
                     mlcLength, mlcInfo, img = detector.findDistance(lmList1[8], lmList1[6], img)
                     mrcLength, mrcInfo, img = detector.findDistance(lmList1[12], lmList1[10], img)
@@ -176,9 +209,9 @@ while True:
                         if myOS == "Darwin":
                             pyautogui.hotkey('command', '[')
                 else:
-                    '''
-                    1-1-2. Mouse Mode 2.
-                    '''
+                    
+                    #1-1-2. Mouse Mode 2.
+                    
                     print("Mouse Mode 2 (Active)")
                     mdLength, mdInfo, img = detector.findDistance(lmList1[8], lmList1[6], img)
                     puLength, puInfo, img = detector.findDistance(lmList1[4], lmList1[14], img)
@@ -212,9 +245,9 @@ while True:
                 # print(idmRate)
 
                 if 40 <= idmRate:
-                    '''
-                    1-2. Volume Control Mode
-                    '''
+                    
+                    #1-2. Volume Control Mode
+                    
                     if fingers1[2:5] == [0, 0, 0] and fingers1 != [0, 0, 0, 0, 0]:
                         print("Volume Control Mode (Active)")
                         mvuLength, mvuInfo, img = detector.findDistance(lmList1[4], lmList1[10], img)
@@ -239,9 +272,9 @@ while True:
                         print("Volume Control Mode (InActive)")
 
                 if 25 <= idmRate < 40:
-                    '''
-                    1-3. Media Control Mode
-                    '''
+                    
+                    #1-3. Media Control Mode
+                    
                     if fingers1[2:5] == [0, 0, 0] and fingers1 != [0, 0, 0, 0, 0]:
                         print("Media Control Mode (Active)")
                         mnLength, mnInfo, img = detector.findDistance(lmList1[4], lmList1[10], img)
@@ -264,9 +297,9 @@ while True:
                         print("Media Control Mode (Inactive)")
 
                 if 0 <= idmRate < 25:
-                    '''
-                    1-4. Desktop Control Mode
-                    '''
+                    
+                    #1-4. Desktop Control Mode
+                    
                     if fingers1[2:5] == [0, 0, 0] and fingers1 != [0, 0, 0, 0, 0]:
                         print("Desktop Control Mode (Active)")
                         ndLength, ndInfo, img = detector.findDistance(lmList1[4], lmList1[10], img)
@@ -291,11 +324,14 @@ while True:
                         print("Desktop Control Mode (Inactive)")
 
             if fingers1 == [0, 0, 1, 0, 0]:
-                '''
-                1-5. Quit Mode.
-                '''
+                
+                #1-5. Quit Mode.
+                
                 print("quit")
                 exit()
+            
+            '''
+            
 
         if len(hands) == 2:
             """
@@ -309,7 +345,7 @@ while True:
             handType1 = hand1["type"]  # hand type (left or right)
             fingers1 = detector.fingersUp(hand1)
 
-            print(f"{handType1} Hand, Center = {centerPoint1}, Fingers = {fingers1}")
+            #print(f"{handType1} Hand, Center = {centerPoint1}, Fingers = {fingers1}")
 
             # 2nd hand info
             hand2 = hands[1]
@@ -319,7 +355,7 @@ while True:
             handType2 = hand2["type"]  # hand type (left or right)
             fingers2 = detector.fingersUp(hand2)
 
-            print(f"{handType2} Hand, Center = {centerPoint2}, Fingers = {fingers2}")
+            #print(f"{handType2} Hand, Center = {centerPoint2}, Fingers = {fingers2}")
 
             # handType1 is left hand and handType2 is right hand
             if handType1 == "Left" and handType2 == "Right":
