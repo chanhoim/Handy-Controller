@@ -180,29 +180,30 @@ while True:
                     1-1-2. Mouse Mode 2.
                     '''
                     print("Mouse Mode 2 (Active)")
-                    mdLength, mdInfo, img = detector.findDistance(lmList1[8], lmList1[6], img)
-                    puLength, puInfo, img = detector.findDistance(lmList1[4], lmList1[14], img)
-                    pdLength, pdInfo, img = detector.findDistance(lmList1[4], lmList1[15], img)
+                    mcLength, mcInfo, img = detector.findDistance(lmList1[8], lmList1[6], img)
+                    msuLength, msuInfo, img = detector.findDistance(lmList1[4], lmList1[14], img)
+                    msdLength, msdInfo, img = detector.findDistance(lmList1[4], lmList1[15], img)
 
-                    if mdLength < 40:
-                        print("double click")
-                        cv2.circle(img, (mdInfo[4], mdInfo[5]), circleRadius2, purple, cv2.FILLED)
+                    if mcLength < 40:
+                        cv2.circle(img, (mcInfo[4], mcInfo[5]), circleRadius2, purple, cv2.FILLED)
                         if myOS == "Windows":
-                            pyautogui.hotkey('ctrl', 'enter')
+                            print("middle click")
+                            pyautogui.click(interval=mocTime, button='middle')
                         if myOS == "Darwin":
+                            print("double click")
                             pyautogui.hotkey('command', 'down')
 
-                    if puLength < mrDist1:
+                    if msuLength < mrDist1:
                         print("page up")
-                        cv2.circle(img, (puInfo[4], puInfo[5]), circleRadius2, purple, cv2.FILLED)
+                        cv2.circle(img, (msuInfo[4], msuInfo[5]), circleRadius2, purple, cv2.FILLED)
                         if myOS == "Windows":
                             pyautogui.scroll(250)
                         if myOS == "Darwin":
                             pyautogui.scroll(10)
 
-                    if pdLength < mrDist1:
+                    if msdLength < mrDist1:
                         print("page down")
-                        cv2.circle(img, (pdInfo[4], pdInfo[5]), circleRadius2, purple, cv2.FILLED)
+                        cv2.circle(img, (msdInfo[4], msdInfo[5]), circleRadius2, purple, cv2.FILLED)
                         if myOS == "Windows":
                             pyautogui.scroll(-250)
                         if myOS == "Darwin":
