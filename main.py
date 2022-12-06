@@ -184,6 +184,7 @@ while True:
                     puLength, puInfo, img = detector.findDistance(lmList1[4], lmList1[14], img)
                     pdLength, pdInfo, img = detector.findDistance(lmList1[4], lmList1[15], img)
 
+                    # TODO: change to new mouse feature
                     if mdLength < 40:
                         print("mouse drag")
                         cv2.circle(img, (mdInfo[4], mdInfo[5]), circleRadius2, purple, cv2.FILLED)
@@ -211,7 +212,7 @@ while True:
                 idmRate = (idmLength / imcLength) * 100  # index distal & middle length to index metacarpal length
                 # print(idmRate)
 
-                if 40 <= idmRate:
+                if 35 <= idmRate:
                     '''
                     1-2. Volume Control Mode
                     '''
@@ -219,26 +220,35 @@ while True:
                         print("Volume Control Mode (Active)")
                         mvuLength, mvuInfo, img = detector.findDistance(lmList1[4], lmList1[10], img)
                         mvdLength, mvdInfo, img = detector.findDistance(lmList1[4], lmList1[11], img)
+                        mvmLength, mvmInfo, img = detector.findDistance(lmList1[4], lmList1[6], img)
 
                         # print(mvuLength, mvuInfo[4], mvuInfo[5])
 
-                        if mvuLength < tiDist1 - 5:
+                        if mvuLength < tmDist1:
                             print("volume up")
                             cv2.circle(img, (mvuInfo[4], mvuInfo[5]), circleRadius2, purple, cv2.FILLED)
                             keyboard.press(Key.media_volume_up)
                             time.sleep(mvcTime)
                             keyboard.release(Key.media_volume_up)
 
-                        if mvdLength < tiDist1 - 5:
+                        if mvdLength < tmDist1:
                             print("volume down")
                             cv2.circle(img, (mvdInfo[4], mvdInfo[5]), circleRadius2, purple, cv2.FILLED)
                             keyboard.press(Key.media_volume_down)
                             time.sleep(mvcTime)
                             keyboard.release(Key.media_volume_down)
+
+                        if mvmLength < 10:
+                            print("volume mute")
+                            cv2.circle(img, (mvmInfo[4], mvmInfo[5]), circleRadius2, purple, cv2.FILLED)
+                            keyboard.press(Key.media_volume_mute)
+                            time.sleep(4 * mvcTime)
+                            keyboard.release(Key.media_volume_mute)
+
                     else:
                         print("Volume Control Mode (InActive)")
 
-                if 25 <= idmRate < 40:
+                if 0 <= idmRate < 35:
                     '''
                     1-3. Media Control Mode
                     '''
@@ -246,56 +256,38 @@ while True:
                         print("Media Control Mode (Active)")
                         mnLength, mnInfo, img = detector.findDistance(lmList1[4], lmList1[10], img)
                         mpLength, mpInfo, img = detector.findDistance(lmList1[4], lmList1[11], img)
+                        mppLength, mppInfo, img = detector.findDistance(lmList1[4], lmList1[6], img)
 
-                        if mpLength < tmDist2:
+                        if mpLength < tmDist1:
                             print("play previous")
                             cv2.circle(img, (mpInfo[4], mpInfo[5]), circleRadius2, purple, cv2.FILLED)
                             keyboard.press(Key.media_previous)
                             time.sleep(mdcTime)
                             keyboard.release(Key.media_previous)
 
-                        if mnLength < tmDist2:
+                        if mnLength < tmDist1:
                             print("play next")
                             cv2.circle(img, (mnInfo[4], mnInfo[5]), circleRadius2, purple, cv2.FILLED)
                             keyboard.press(Key.media_next)
                             time.sleep(mdcTime)
                             keyboard.release(Key.media_next)
+
+                        if mppLength < 15:
+                            print("play/pause")
+                            cv2.circle(img, (mppInfo[4], mppInfo[5]), circleRadius2, purple, cv2.FILLED)
+                            keyboard.press(Key.media_play_pause)
+                            time.sleep(1.5 * mdcTime)
+                            keyboard.release(Key.media_play_pause)
                     else:
                         print("Media Control Mode (Inactive)")
 
-                if 0 <= idmRate < 25:
-                    '''
-                    1-4. Desktop Control Mode
-                    '''
-                    if fingers1[2:5] == [0, 0, 0] and fingers1 != [0, 0, 0, 0, 0]:
-                        print("Desktop Control Mode (Active)")
-                        ndLength, ndInfo, img = detector.findDistance(lmList1[4], lmList1[10], img)
-                        pdLength, pdInfo, img = detector.findDistance(lmList1[4], lmList1[11], img)
-
-                        if pdLength < tmDist2:
-                            print("previous desktop")
-                            cv2.circle(img, (pdInfo[4], pdInfo[5]), circleRadius2, purple, cv2.FILLED)
-                            if myOS == "Windows":
-                                pyautogui.hotkey('win', 'ctrl', 'left')
-                            if myOS == "Darwin":
-                                pyautogui.hotkey('ctrl', 'left')
-
-                        if ndLength < tmDist2:
-                            print("next desktop")
-                            cv2.circle(img, (ndInfo[4], ndInfo[5]), circleRadius2, purple, cv2.FILLED)
-                            if myOS == "Windows":
-                                pyautogui.hotkey('win', 'ctrl', 'right')
-                            if myOS == "Darwin":
-                                pyautogui.hotkey('ctrl', 'right')
-                    else:
-                        print("Desktop Control Mode (Inactive)")
-
+            # TODO: change quit gesture
             if fingers1 == [0, 0, 1, 0, 0]:
                 '''
                 1-5. Quit Mode.
                 '''
                 print("quit")
-                exit()
+                # exit()
 
         if len(hands) == 2:
             """
@@ -355,7 +347,7 @@ while True:
                             keyboard.release(Key.media_volume_up)
 
                         if mvmLength < tiDist2:
-                            print("mute")
+                            print("volume mute")
                             cv2.circle(img, (mvmInfo[4], mvmInfo[5]), circleRadius2, purple, cv2.FILLED)
                             keyboard.press(Key.media_volume_mute)
                             time.sleep(4 * mvcTime)

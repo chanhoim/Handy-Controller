@@ -261,7 +261,8 @@ def main():
 
         # display
         cv2.imshow("HandTrackingModule", img)
-        cv2.waitKey(1)
+        if cv2.waitKey(1) == ord('q'):
+            break
 
 
 if __name__ == "__main__":
