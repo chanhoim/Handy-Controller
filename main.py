@@ -83,6 +83,18 @@ detector = HandDetector(detectionCon=0.9, maxHands=2)
 
 # control mode
 controlMode=None
+mode={
+    None: "None",
+    0 : "Idle",
+    1 : "Volume",
+    2 : "Mouse",
+    3 : "Media",
+    4 : "Page",
+    5 : "Desktop"
+}
+def translateControlMode(controlMode):
+    return mode.get(controlMode,"Error")
+
 
 while True:
     success, img = cap.read()
@@ -108,7 +120,7 @@ while True:
             x1, y1 = lmList1[8][0], lmList1[8][1]  # index finger location
 
             # print(x1, y1)
-            #print(f"{handType1} Hand, Center = {centerPoint1}, Fingers = {fingers1}")
+            print(f"{handType1} Hand, Center = {centerPoint1}, Fingers = {fingers1}")
             # print("bounding box area = ", bbox1Area)
 
             cv2.rectangle(img=img, pt1=(frmW, frmH), pt2=(camW - frmW, camH - frmH), color=purple,
@@ -128,12 +140,12 @@ while True:
                     print("media control mode")
                     controlMode=3
                 elif fingers1[0:5] == [0, 1, 1, 1, 1]:
-                    print("volume control mode")
+                    print("page control mode")
                     controlMode=4
                 elif fingers1[0:5] == [1, 1, 1, 1, 1]:
                     print("desktop control mode")
                     controlMode=5
-                   elif fingers1[0:5] == [0, 0, 1, 0, 0]:
+                elif fingers1[0:5] == [0, 0, 1, 0, 0]:
                     print("quit")
                     exit()
             
@@ -578,6 +590,8 @@ while True:
     fps = 1 / (cTime - pTime)
     pTime = cTime
     cv2.putText(img, str(int(fps)), (10, 30), cv2.FONT_HERSHEY_PLAIN, fontSize1,
+                green, lineThickness1)
+    cv2.putText(img,"MODE:"+translateControlMode(controlMode),(470,30),cv2.FONT_HERSHEY_PLAIN, fontSize1,
                 green, lineThickness1)
 
     cv2.imshow("main", img)
