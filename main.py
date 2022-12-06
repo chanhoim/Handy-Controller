@@ -95,6 +95,9 @@ mode={
 def translateControlMode(controlMode):
     return mode.get(controlMode,"Error")
 
+# boolean value for idle mode
+idle=False
+
 
 while True:
     success, img = cap.read()
@@ -120,7 +123,7 @@ while True:
             x1, y1 = lmList1[8][0], lmList1[8][1]  # index finger location
 
             # print(x1, y1)
-            print(f"{handType1} Hand, Center = {centerPoint1}, Fingers = {fingers1}")
+            #print(f"{handType1} Hand, Center = {centerPoint1}, Fingers = {fingers1}")
             # print("bounding box area = ", bbox1Area)
 
             cv2.rectangle(img=img, pt1=(frmW, frmH), pt2=(camW - frmW, camH - frmH), color=purple,
@@ -130,29 +133,46 @@ while True:
                 if fingers1[0:5] == [0, 0, 0, 0, 0]:
                     print("idle state Mode")
                     controlMode=0
-                elif fingers1[0:5] == [0, 1, 0, 0, 0]:
+                    idle= not idle
+                    print("idle:"+str(idle))
+                    time.sleep(1)
+                elif fingers1[0:5] == [0, 1, 0, 0, 0] and not idle:
                     print("volume control mode")
                     controlMode=1
-                elif fingers1[0:5] == [0, 1, 1, 0, 0]:
+                elif fingers1[0:5] == [0, 1, 1, 0, 0] and not idle:
                     print("mouse control mode")
                     controlMode=2
-                elif fingers1[0:5] == [0, 1, 1, 1, 0]:
+                elif fingers1[0:5] == [0, 1, 1, 1, 0] and not idle:
                     print("media control mode")
                     controlMode=3
-                elif fingers1[0:5] == [0, 1, 1, 1, 1]:
+                elif fingers1[0:5] == [0, 1, 1, 1, 1] and not idle:
                     print("page control mode")
                     controlMode=4
-                elif fingers1[0:5] == [1, 1, 1, 1, 1]:
+                elif fingers1[0:5] == [1, 1, 1, 1, 1] and not idle:
                     print("desktop control mode")
                     controlMode=5
-                elif fingers1[0:5] == [0, 0, 1, 0, 0]:
+                elif fingers1[0:5] == [0, 0, 1, 0, 0] and not idle:
                     print("quit")
                     exit()
             
 
                     
-            elif handType1=="Right":
-                print("Control Mode Status="+str(controlMode))
+            elif handType1== "Right":
+                print("Control Mode Status="+translateControlMode(controlMode))
+                if idle:
+                    print("It's idle status, do nothing")
+                else:
+                    if controlMode == 1:
+                        print("I can control volume")
+                    elif controlMode == 2:
+                        print("I can control mouse")
+                    elif controlMode == 3:
+                        print("I can control media")
+                    elif controlMode == 4:
+                        print("I can control page")
+                    elif controlMode == 5:
+                        print("I can control desktop")
+            
 
 
             '''
