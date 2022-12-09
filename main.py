@@ -91,7 +91,8 @@ mode={
     3 : "Mouse-2",
     4 : "Media",
     5 : "Page",
-    6 : "Desktop"
+    6 : "Desktop",
+    7 : "Bright"
 }
 
 
@@ -162,6 +163,9 @@ while True:
                 elif fingers1[0:5] == [1, 1, 1, 1, 1] and not idle:
                     print("desktop control mode")
                     controlMode=6
+                elif fingers1[0:5] == [1,0,0,0,0] and not idle:
+                    print("brightness control mode")
+                    controlMode=7
                 elif fingers1[0:5] == [0, 0, 1, 0, 0] and not idle:
                     print("quit")
                     exit()
@@ -405,6 +409,50 @@ while True:
                                 pyautogui.hotkey('win', 'd')
                             if myOS == "Darwin":
                                 pyautogui.hotkey('fn', 'f10')
+
+                    elif controlMode==7:
+                        print("Brightness Control Mode")
+                        buLength, buInfo, img = detector.findDistance(lmList1[4], lmList1[10], img)
+                        bdLength, bdInfo, img = detector.findDistance(lmList1[4], lmList1[11], img)
+
+                        bMaxLength, bMaxInfo, img = detector.findDistance(lmList1[8], lmList1[4], img)
+                        bMinLength, bMinInfo, img = detector.findDistance(lmList1[8], lmList1[3], img)
+
+                        # TODO: fix brightness up & down feature for MacOSX
+                        if bdLength < tmDist2:
+                            print("brightness down")
+                            cv2.circle(img, (bdInfo[4], bdInfo[5]), circleRadius2, purple, cv2.FILLED)
+                            if myOS == "Windows":
+                                sbc.set_brightness('-10')  # decrease by 10 %
+                            if myOS == "Darwin":
+                                pyautogui.hotkey('fn', 'f11')
+
+                        if buLength < tmDist2:
+                            print("brightness up")
+                            cv2.circle(img, (buInfo[4], buInfo[5]), circleRadius2, purple, cv2.FILLED)
+                            if myOS == "Windows":
+                                sbc.set_brightness('+10')  # increase by 10 %
+                            if myOS == "Darwin":
+                                pyautogui.hotkey('fn', 'f12')
+
+                        # TODO: implement max and min brightness feature for MacOSX
+                        if bMaxLength < tiDist2:
+                            print("brightness 100%")
+                            cv2.circle(img, (bMaxInfo[4], bMaxInfo[5]), circleRadius2, purple, cv2.FILLED)
+                            if myOS == "Windows":
+                                sbc.set_brightness(100)
+                            if myOS == "Darwin":
+                                print("not implemented in MacOSX yet")
+
+                        if bMinLength < tiDist2:
+                            print("brightness 0%")
+                            cv2.circle(img, (bMinInfo[4], bMinInfo[5]), circleRadius2, purple, cv2.FILLED)
+                            if myOS == "Windows":
+                                sbc.set_brightness(0)
+                            if myOS == "Darwin":
+                                print("not implemented in MacOSX yet")
+                        
+
             
 
 
