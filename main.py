@@ -256,7 +256,50 @@ while True:
                                 pyautogui.hotkey('command', '[')
 
                     elif controlMode==3:
-                        print("I can control mouse -2")
+                        print("Mouse Mode 2")
+
+                        x3 = np.interp(x1, (frmW, camW - frmW), (0, scrW))
+                        y3 = np.interp(y1, (frmH, camH - frmH), (0, scrH))
+
+                        # smoothen values
+                        clocX = plocX + (x3 - plocX) / smoothening
+                        clocY = plocY + (y3 - plocY) / smoothening
+
+                        # print(clocX, clocY)  # cursor location
+                        # print(x3, y3)  # index finger location in  window
+
+                        # mouse move
+                        if fingers1 == [1, 1, 1, 0, 0]:
+                            pyautogui.moveTo(clocX, clocY)
+                            cv2.circle(img, (x1, y1), circleRadius2, cyan, cv2.FILLED)
+                            plocX, plocY = clocX, clocY
+
+                        
+                        mdLength, mdInfo, img = detector.findDistance(lmList1[8], lmList1[6], img)
+                        puLength, puInfo, img = detector.findDistance(lmList1[4], lmList1[5], img) #4,14 -> 4,5
+                        pdLength, pdInfo, img = detector.findDistance(lmList1[4], lmList1[6], img) #4,15 -> 4,6
+
+                        if mdLength < 40:
+                            print("mouse drag")
+                            cv2.circle(img, (mdInfo[4], mdInfo[5]), circleRadius2, purple, cv2.FILLED)
+                            pyautogui.dragTo(clocX, clocY, button='left')
+
+                        if puLength < 40:   #mrDist1->40
+                            print("page up")
+                            cv2.circle(img, (puInfo[4], puInfo[5]), circleRadius2, purple, cv2.FILLED)
+                            if myOS == "Windows":
+                                pyautogui.scroll(250)
+                            if myOS == "Darwin":
+                                pyautogui.scroll(10)
+
+                        if pdLength < 40:  #mrDist1->40
+                            print("page down")
+                            cv2.circle(img, (pdInfo[4], pdInfo[5]), circleRadius2, purple, cv2.FILLED)
+                            if myOS == "Windows":
+                                pyautogui.scroll(-250)
+                            if myOS == "Darwin":
+                                pyautogui.scroll(-10)
+                    
                     elif controlMode == 4:
                         print("I can control media")
                     elif controlMode == 5:
