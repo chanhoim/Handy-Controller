@@ -367,7 +367,44 @@ while True:
                             keyboard.release(Key.end)
 
                     elif controlMode == 6:
-                        print("I can control desktop")
+                        print("Desktop Control Mode")
+                        ndLength, ndInfo, img = detector.findDistance(lmList1[4], lmList1[10], img)
+                        pdLength, pdInfo, img = detector.findDistance(lmList1[4], lmList1[11], img)
+
+                        mlcLength, mlcInfo, img = detector.findDistance(lmList1[8], lmList1[4], img)
+                        sdLength, sdInfo, img = detector.findDistance(lmList1[8], lmList1[3], img)
+
+                        if pdLength < tmDist2:
+                            print("previous desktop")
+                            cv2.circle(img, (pdInfo[4], pdInfo[5]), circleRadius2, purple, cv2.FILLED)
+                            if myOS == "Windows":
+                                pyautogui.hotkey('win', 'ctrl', 'left')
+                            if myOS == "Darwin":
+                                pyautogui.hotkey('ctrl', 'left')
+
+                        if ndLength < tmDist2:
+                            print("next desktop")
+                            cv2.circle(img, (ndInfo[4], ndInfo[5]), circleRadius2, purple, cv2.FILLED)
+                            if myOS == "Windows":
+                                pyautogui.hotkey('win', 'ctrl', 'right')
+                            if myOS == "Darwin":
+                                pyautogui.hotkey('ctrl', 'right')
+
+                        if mlcLength < tiDist2:
+                            print("show applications")
+                            cv2.circle(img, (mlcInfo[4], mlcInfo[5]), circleRadius2, purple, cv2.FILLED)
+                            if myOS == "Windows":
+                                pyautogui.hotkey('win', 'tab')
+                            if myOS == "Darwin":
+                                pyautogui.hotkey('ctrl', 'up')
+
+                        if sdLength < tiDist2:
+                            print("show desktop")
+                            cv2.circle(img, (sdInfo[4], sdInfo[5]), circleRadius2, purple, cv2.FILLED)
+                            if myOS == "Windows":
+                                pyautogui.hotkey('win', 'd')
+                            if myOS == "Darwin":
+                                pyautogui.hotkey('fn', 'f10')
             
 
 
