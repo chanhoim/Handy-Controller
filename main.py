@@ -87,16 +87,21 @@ mode={
     None: "None",
     0 : "Idle",
     1 : "Volume",
-    2 : "Mouse",
-    3 : "Media",
-    4 : "Page",
-    5 : "Desktop"
+    2 : "Mouse-1",
+    3 : "Mouse-2",
+    4 : "Media",
+    5 : "Page",
+    6 : "Desktop"
 }
+
+
+
 def translateControlMode(controlMode):
     return mode.get(controlMode,"Error")
 
 # boolean value for idle mode
 idle=False
+
 
 
 while True:
@@ -140,17 +145,24 @@ while True:
                     print("volume control mode")
                     controlMode=1
                 elif fingers1[0:5] == [0, 1, 1, 0, 0] and not idle:
-                    print("mouse control mode")
-                    controlMode=2
+                    modeLength, modeInfo, img = detector.findDistance(lmList1[12], lmList1[8], img)
+                    print("modeLength",str(modeLength))
+                    if modeLength > miDist1:
+                       print("mouse control mode-1")
+                       controlMode=2
+                    else:
+                       print("mouse control mode-2")
+                       controlMode=3
+                       
                 elif fingers1[0:5] == [0, 1, 1, 1, 0] and not idle:
                     print("media control mode")
-                    controlMode=3
+                    controlMode=4
                 elif fingers1[0:5] == [0, 1, 1, 1, 1] and not idle:
                     print("page control mode")
-                    controlMode=4
+                    controlMode=5
                 elif fingers1[0:5] == [1, 1, 1, 1, 1] and not idle:
                     print("desktop control mode")
-                    controlMode=5
+                    controlMode=6
                 elif fingers1[0:5] == [0, 0, 1, 0, 0] and not idle:
                     print("quit")
                     exit()
@@ -164,15 +176,19 @@ while True:
                 else:
                     if controlMode == 1:
                         print("I can control volume")
+
                     elif controlMode == 2:
-                        print("I can control mouse")
-                    elif controlMode == 3:
-                        print("I can control media")
+                        print("I can control mouse -1")
+                    elif controlMode==3:
+                        print("I can control mouse -2")
                     elif controlMode == 4:
-                        print("I can control page")
+                        print("I can control media")
                     elif controlMode == 5:
+                        print("I can control page")
+                    elif controlMode == 6:
                         print("I can control desktop")
             
+
 
 
             '''
@@ -605,13 +621,15 @@ while True:
 
             print("")
 
+    
+
     # show fps
     cTime = time.time()
     fps = 1 / (cTime - pTime)
     pTime = cTime
     cv2.putText(img, str(int(fps)), (10, 30), cv2.FONT_HERSHEY_PLAIN, fontSize1,
                 green, lineThickness1)
-    cv2.putText(img,"MODE:"+translateControlMode(controlMode),(470,30),cv2.FONT_HERSHEY_PLAIN, fontSize1,
+    cv2.putText(img,"MODE:"+translateControlMode(controlMode),(450,30),cv2.FONT_HERSHEY_PLAIN, fontSize1,
                 green, lineThickness1)
 
     cv2.imshow("main", img)
