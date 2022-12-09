@@ -239,7 +239,7 @@ while True:
                             cv2.circle(img, (mrcInfo[4], mrcInfo[5]), circleRadius2, purple, cv2.FILLED)
                             pyautogui.rightClick(interval=mocTime)
 
-                        if gfLength < mrDist1:
+                        if gfLength < 40:    #mrDist1 -> 40
                             print("go forward")
                             cv2.circle(img, (gfInfo[4], gfInfo[5]), circleRadius2, purple, cv2.FILLED)
                             if myOS == "Windows":
@@ -247,7 +247,7 @@ while True:
                             if myOS == "Darwin":
                                 pyautogui.hotkey('command', ']')
 
-                        if gbLength < mrDist1:
+                        if gbLength < 40:   #mrDist1 -> 40
                             print("gp backward")
                             cv2.circle(img, (gbInfo[4], gbInfo[5]), circleRadius2, purple, cv2.FILLED)
                             if myOS == "Windows":
@@ -301,7 +301,33 @@ while True:
                                 pyautogui.scroll(-10)
                     
                     elif controlMode == 4:
-                        print("I can control media")
+                        print("Media Control Mode")
+                        mnLength, mnInfo, img = detector.findDistance(lmList1[4], lmList1[10], img)
+                        mpLength, mpInfo, img = detector.findDistance(lmList1[4], lmList1[11], img)
+
+                        mppLength, mppInfo, img = detector.findDistance(lmList1[8], lmList1[4], img)
+
+                        if mpLength < tmDist2:
+                            print("play previous")
+                            cv2.circle(img, (mpInfo[4], mpInfo[5]), circleRadius2, purple, cv2.FILLED)
+                            keyboard.press(Key.media_previous)
+                            time.sleep(mdcTime)
+                            keyboard.release(Key.media_previous)
+
+                        if mnLength < tmDist2:
+                            print("play next")
+                            cv2.circle(img, (mnInfo[4], mnInfo[5]), circleRadius2, purple, cv2.FILLED)
+                            keyboard.press(Key.media_next)
+                            time.sleep(mdcTime)
+                            keyboard.release(Key.media_next)
+
+                        if mppLength < tiDist2:
+                            print("play/pause")
+                            cv2.circle(img, (mppInfo[4], mppInfo[5]), circleRadius2, purple, cv2.FILLED)
+                            keyboard.press(Key.media_play_pause)
+                            time.sleep(mdcTime)
+                            keyboard.release(Key.media_play_pause)
+
                     elif controlMode == 5:
                         print("I can control page")
                     elif controlMode == 6:
