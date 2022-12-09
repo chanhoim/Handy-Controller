@@ -329,7 +329,43 @@ while True:
                             keyboard.release(Key.media_play_pause)
 
                     elif controlMode == 5:
-                        print("I can control page")
+                        print("Page Control Mode")
+                        puLength, puInfo, img = detector.findDistance(lmList1[4], lmList1[10], img)
+                        pdLength, pdInfo, img = detector.findDistance(lmList1[4], lmList1[11], img)
+
+                        phLength, phInfo, img = detector.findDistance(lmList1[8], lmList1[4], img)
+                        peLength, peInfo, img = detector.findDistance(lmList1[8], lmList1[3], img)
+
+                        if pdLength < tmDist2:
+                            print("page down")
+                            cv2.circle(img, (pdInfo[4], pdInfo[5]), circleRadius2, purple, cv2.FILLED)
+                            if myOS == "Windows":
+                                pyautogui.scroll(-250)
+                            if myOS == "Darwin":
+                                pyautogui.scroll(-10)
+
+                        if puLength < tmDist2:
+                            print("page up")
+                            cv2.circle(img, (puInfo[4], puInfo[5]), circleRadius2, purple, cv2.FILLED)
+                            if myOS == "Windows":
+                                pyautogui.scroll(250)
+                            if myOS == "Darwin":
+                                pyautogui.scroll(10)
+
+                        if phLength < tiDist2:
+                            print("home")
+                            cv2.circle(img, (phInfo[4], phInfo[5]), circleRadius2, purple, cv2.FILLED)
+                            keyboard.press(Key.home)
+                            time.sleep(pgcTime)
+                            keyboard.release(Key.home)
+
+                        if peLength < tiDist2:
+                            print("end")
+                            cv2.circle(img, (peInfo[4], peInfo[5]), circleRadius2, purple, cv2.FILLED)
+                            keyboard.press(Key.end)
+                            time.sleep(pgcTime)
+                            keyboard.release(Key.end)
+
                     elif controlMode == 6:
                         print("I can control desktop")
             
