@@ -146,7 +146,6 @@ while True:
                     controlMode=1
                 elif fingers1[0:5] == [0, 1, 1, 0, 0] and not idle:
                     modeLength, modeInfo, img = detector.findDistance(lmList1[12], lmList1[8], img)
-                    print("modeLength",str(modeLength))
                     if modeLength > miDist1:
                        print("mouse control mode-1")
                        controlMode=2
@@ -170,13 +169,41 @@ while True:
 
                     
             elif handType1== "Right":
-                print("Control Mode Status="+translateControlMode(controlMode))
+                #print("Control Mode Status="+translateControlMode(controlMode))
                 if idle:
                     print("It's idle status, do nothing")
                 else:
                     if controlMode == 1:
-                        print("I can control volume")
+                        print("Volume Control Mode")
+                        mvuLength, mvuInfo, img = detector.findDistance(lmList1[4], lmList1[10], img)
+                        mvdLength, mvdInfo, img = detector.findDistance(lmList1[4], lmList1[11], img)
+                        mvmLength, mvmInfo, img = detector.findDistance(lmList1[8], lmList1[4], img)
 
+
+                        #print(mvuLength, mvuInfo[4], mvuInfo[5])
+
+                        if mvuLength < tiDist1 - 5:
+                            print("volume up")
+                            cv2.circle(img, (mvuInfo[4], mvuInfo[5]), circleRadius2, purple, cv2.FILLED)
+                            keyboard.press(Key.media_volume_up)
+                            time.sleep(mvcTime)
+                            keyboard.release(Key.media_volume_up)
+
+                        if mvdLength < tiDist1 - 5:
+                            print("volume down")
+                            cv2.circle(img, (mvdInfo[4], mvdInfo[5]), circleRadius2, purple, cv2.FILLED)
+                            keyboard.press(Key.media_volume_down)
+                            time.sleep(mvcTime)
+                            keyboard.release(Key.media_volume_down)
+
+                        if mvmLength < tiDist2:
+                            print("mute")
+                            cv2.circle(img, (mvmInfo[4], mvmInfo[5]), circleRadius2, purple, cv2.FILLED)
+                            keyboard.press(Key.media_volume_mute)
+                            time.sleep(4 * mvcTime)
+                            keyboard.release(Key.media_volume_mute)
+
+                        
                     elif controlMode == 2:
                         print("I can control mouse -1")
                     elif controlMode==3:
