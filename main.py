@@ -205,7 +205,56 @@ while True:
 
                         
                     elif controlMode == 2:
-                        print("I can control mouse -1")
+                        print("Mouse Mode 1")
+
+                        x3 = np.interp(x1, (frmW, camW - frmW), (0, scrW))
+                        y3 = np.interp(y1, (frmH, camH - frmH), (0, scrH))
+
+                        # smoothen values
+                        clocX = plocX + (x3 - plocX) / smoothening
+                        clocY = plocY + (y3 - plocY) / smoothening
+
+                        # print(clocX, clocY)  # cursor location
+                        # print(x3, y3)  # index finger location in  window
+
+                        # mouse move
+                        if fingers1 == [1, 1, 1, 0, 0]:
+                            pyautogui.moveTo(clocX, clocY)
+                            cv2.circle(img, (x1, y1), circleRadius2, cyan, cv2.FILLED)
+                            plocX, plocY = clocX, clocY
+
+                        
+                        mlcLength, mlcInfo, img = detector.findDistance(lmList1[8], lmList1[6], img)
+                        mrcLength, mrcInfo, img = detector.findDistance(lmList1[12], lmList1[10], img)
+                        gbLength, gbInfo, img = detector.findDistance(lmList1[4], lmList1[6], img) #4,15 -> 4,6
+                        gfLength, gfInfo, img = detector.findDistance(lmList1[4], lmList1[5], img) #4,14 -> 4,5
+
+                        if mlcLength < 40:
+                            print("left click")
+                            cv2.circle(img, (mlcInfo[4], mlcInfo[5]), circleRadius2, purple, cv2.FILLED)
+                            pyautogui.click(interval=mocTime)
+
+                        if mrcLength < 40:
+                            print("right click")
+                            cv2.circle(img, (mrcInfo[4], mrcInfo[5]), circleRadius2, purple, cv2.FILLED)
+                            pyautogui.rightClick(interval=mocTime)
+
+                        if gfLength < mrDist1:
+                            print("go forward")
+                            cv2.circle(img, (gfInfo[4], gfInfo[5]), circleRadius2, purple, cv2.FILLED)
+                            if myOS == "Windows":
+                                pyautogui.hotkey('alt', 'right')
+                            if myOS == "Darwin":
+                                pyautogui.hotkey('command', ']')
+
+                        if gbLength < mrDist1:
+                            print("gp backward")
+                            cv2.circle(img, (gbInfo[4], gbInfo[5]), circleRadius2, purple, cv2.FILLED)
+                            if myOS == "Windows":
+                                pyautogui.hotkey('alt', 'left')
+                            if myOS == "Darwin":
+                                pyautogui.hotkey('command', '[')
+
                     elif controlMode==3:
                         print("I can control mouse -2")
                     elif controlMode == 4:
