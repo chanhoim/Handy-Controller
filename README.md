@@ -1,3 +1,15 @@
+# **Hand Gesture Mouse**
+---------------------------------------------------
+### Control the mouse with hand gestures
+You can perform certain mouse functions with certain hand gestures.
+
+## Functions & Hand Gestures
+---------------------------------------------------
+### Hand Landmarks
+![Hand_Landmarks](https://github.com/chanhoim/Handy-Controller/blob/dev_KKDDJJ/hand_landmarks.png?raw=true)
+
+1. 
+
 Open Source Software  
 
 Team 32  
