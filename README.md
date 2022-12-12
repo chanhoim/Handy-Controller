@@ -1,7 +1,8 @@
 # **Hand Gesture Mouse**
 --------------------------------------------------
 ### Control the mouse with hand gestures
-You can perform certain mouse functions with certain hand gestures.
+You can perform certain mouse functions with certain hand gestures.  
+ex) Volume Control, Mouse Control, Page control, etc.
 
 ## Functions & Hand Gestures
 --------------------------------------------------
@@ -12,7 +13,7 @@ You can perform certain mouse functions with certain hand gestures.
 1. **Thumb**
 -> **Brightness Control Mode**
 2. **Fist Gesture**
--> *Idle State Mode**
+-> **Idle State Mode**
 3. **Middle Finger**
 -> **Quit**
 4. **Index Finger**
