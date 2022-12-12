@@ -49,8 +49,8 @@ You can perform certain mouse functions with certain hand gestures.
 ## Team 32
 ---------------------------------------------------
 > 202234863 Kim Dong Ju
-  201638413 Nam Jong Su
-  201835510 Im Chan Ho
+ 201638413 Nam Jong Su
+ 201835510 Im Chan Ho
 
 ## References  
 ---------------------------------------------------
@@ -61,16 +61,8 @@ You can perform certain mouse functions with certain hand gestures.
 - **[Multiple Hand Gesture Control with OpenCV Python | CVZone](https://youtu.be/3xfOa4yeOb0)**
 - **[pynput](https://pypi.org/project/pynput/)**
 
-Open Source Software  
-
-Team 32  
-
-202234863 김동주  
-201638413 남종수  
-201835510 임찬호
-
-
 References  
+---------------------------------------------------
 https://pyautogui.readthedocs.io/en/latest/
 https://google.github.io/mediapipe/    
 https://mediapipe.dev/  
