@@ -2,7 +2,7 @@
 --------------------------------------------------
 ### Control the mouse with hand gestures
 You can perform certain mouse functions with certain hand gestures.  
-ex) Volume Control, Mouse Control, Page control, etc.
+**ex)** Volume Control, Mouse Control, Page control, etc.
 
 ## Functions & Hand Gestures
 --------------------------------------------------
@@ -10,22 +10,22 @@ ex) Volume Control, Mouse Control, Page control, etc.
 ![Hand_Landmarks](https://github.com/chanhoim/Handy-Controller/blob/dev_KKDDJJ/hand_landmarks.png?raw=true)
 
 ### Left Hand (Mode Selection)
-1. **Thumb**
--> **Brightness Control Mode**
-2. **Fist Gesture**
--> **Idle State Mode**
-3. **Middle Finger**
--> **Quit**
-4. **Index Finger**
--> **Volume Control Mode**
-5. **Index Finger + Middle Finger**
--> **Mouse Control Mode-1,2**
-6. **Index Finger + Middle Finger + Ring Finger**
+1. **Thumb**  
+-> **Brightness Control Mode**  
+2. **Fist Gesture**  
+-> **Idle State Mode**  
+3. **Middle Finger**  
+-> **Quit**  
+4. **Index Finger**  
+-> **Volume Control Mode**  
+5. **Index Finger + Middle Finger**  
+-> **Mouse Control Mode-1,2**  
+6. **Index Finger + Middle Finger + Ring Finger**  
 -> **Media Control Mode**
-7. **Index Finger + Middle Finger + Ring Finger + Little Finger**
--> **Page Control Mode**
-8. **All Fingers**
--> **Desktop Control Mode**
+7. **Index Finger + Middle Finger + Ring Finger + Little Finger**  
+-> **Page Control Mode**  
+8. **All Fingers**  
+-> **Desktop Control Mode**  
 
 ## Requirements
 -------------------------------------------------
@@ -77,3 +77,4 @@ ex) Volume Control, Mouse Control, Page control, etc.
 - **[AI Virtual Mouse | OpenCV Python | Computer Vision](https://youtu.be/8gPONnGIPgw)**
 - **[Multiple Hand Gesture Control with OpenCV Python | CVZone](https://youtu.be/3xfOa4yeOb0)**
 - **[pynput](https://pypi.org/project/pynput/)**
+
