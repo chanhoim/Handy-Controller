@@ -52,6 +52,15 @@ You can perform certain mouse functions with certain hand gestures.
   201638413 Nam Jong Su
   201835510 Im Chan Ho
 
+## References  
+---------------------------------------------------
+-  **[PyAutoGUI](https://pyautogui.readthedocs.io/en/latest/)**
+- **[MediaPipe](https://google.github.io/mediapipe/)**
+- **[MedaiPipe Solutions](https://mediapipe.dev/)**
+- **[AI Virtual Mouse | OpenCV Python | Computer Vision](https://youtu.be/8gPONnGIPgw)**
+- **[Multiple Hand Gesture Control with OpenCV Python | CVZone](https://youtu.be/3xfOa4yeOb0)**
+- **[pynput](https://pypi.org/project/pynput/)**
+
 Open Source Software  
 
 Team 32  
