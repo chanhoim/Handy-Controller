@@ -1,17 +1,33 @@
 # **Hand Gesture Mouse**
----
+--------------------------------------------------
 ### Control the mouse with hand gestures
 You can perform certain mouse functions with certain hand gestures.
 
 ## Functions & Hand Gestures
--------------------------------------------------
+--------------------------------------------------
 ### Hand Landmarks
 ![Hand_Landmarks](https://github.com/chanhoim/Handy-Controller/blob/dev_KKDDJJ/hand_landmarks.png?raw=true)
 
-1. 
+### Left Hand (Mode Selection)
+1. Thumb
+-> Brightness Control Mode
+2. Fist Gesture
+-> Idle State Mode
+3. Middle Finger
+-> Quit
+4. Index Finger
+-> Volume Control Mode
+5. Index Finger + Middle Finger
+-> Mouse Control Mode-1,2
+6. Index Finger + Middle Finger + Ring Finger
+-> Media Control Mode
+7. Index Finger + Middle Finger + Ring Finger + Little Finger
+-> Page Control Mode
+8. All Fingers
+-> Desktop Control Mode
 
 ## Requirements
---------------------------------------------------
+-------------------------------------------------
 1. absl-py (1.3.0)
 2. attrs (22.1.0)
 3. contourpy (1.0.6)
@@ -47,13 +63,13 @@ You can perform certain mouse functions with certain hand gestures.
 33. six (1.16.0)
 
 ## Team 32
----------------------------------------------------
-> 202234863 Kim Dong Ju
-> 201638413 Nam Jong Su
-> 201835510 Im Chan Ho
+--------------------------------------------------
+> 202234863 Kim Dong Ju  
+> 201638413 Nam Jong Su  
+> 201835510 Im Chan Ho  
 
 ## References  
----------------------------------------------------
+--------------------------------------------------
 -  **[PyAutoGUI](https://pyautogui.readthedocs.io/en/latest/)**
 - **[MediaPipe](https://google.github.io/mediapipe/)**
 - **[MedaiPipe Solutions](https://mediapipe.dev/)**
