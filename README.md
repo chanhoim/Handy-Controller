@@ -46,6 +46,12 @@ You can perform certain mouse functions with certain hand gestures.
 32. screen-brightness-control (0.17.0)
 33. six (1.16.0)
 
+## Team 32
+---------------------------------------------------
+> 202234863 Kim Dong Ju
+  201638413 Nam Jong Su
+  201835510 Im Chan Ho
+
 Open Source Software  
 
 Team 32  
